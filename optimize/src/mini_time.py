@@ -2,8 +2,6 @@ import sys
 import time
 import numpy as np
 import casadi as ca
-import trajectory_planning_helpers as tph
-from scipy import interpolate
 from parameters import scale
 
 def mini_time(track: np.ndarray,
@@ -400,7 +398,6 @@ def mini_time(track: np.ndarray,
     t0 = time.perf_counter()
 
     # solve NLP
-
     sol = solver(x0=w0, lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg)
 
     # end time measure
@@ -418,9 +415,6 @@ def mini_time(track: np.ndarray,
     f_sol = ca.Function('f_sol', [w], [x_opt, u_opt, tf_opt, dt_opt, ax_opt, ay_opt, ec_opt],
                         ['w'], ['x_opt', 'u_opt', 'tf_opt', 'dt_opt', 'ax_opt', 'ay_opt', 'ec_opt'])
 
-
-
-    pwr_comps = None
 
     # extract solution
     x_opt, u_opt, tf_opt, dt_opt, ax_opt, ay_opt, ec_opt = f_sol(sol['x'])
@@ -445,7 +439,6 @@ def mini_time(track: np.ndarray,
 
     # solution for energy consumption
     ec_opt_cum = np.hstack((0.0, np.cumsum(ec_opt))) / 3600.0
-
 
     return -x_opt[:-1, 3], x_opt[:-1, 0], u_opt, t_opt
 
