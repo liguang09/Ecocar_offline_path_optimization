@@ -12,7 +12,7 @@ def smooth_track(track: np.ndarray) -> np.ndarray:
 
     #-------------------------------------------------------------------------------------------------------------------
     # Smooth center line
-    #-------------------------------------------------------------------------------------------------------------------
+    #----------------------------------------------------------------------------------------------------------------
     s_track_cl= np.cumsum(np.sqrt(np.sum(np.power(np.diff(track_closed[:, :2], axis=0), 2), axis=1)))
     s_track_cl= np.insert(s_track_cl, 0, 0.0)
 
@@ -30,7 +30,7 @@ def smooth_track(track: np.ndarray) -> np.ndarray:
     s_linear_cl= np.insert(s_linear_cl, 0, 0.0)
 
     # Smooth the track by spline
-    tck_cl= interpolate.splprep([track_linear_cl[:, 0], track_linear_cl[:, 1]], k=3, s= 10, per=1)[:2]
+    tck_cl, u_cl= interpolate.splprep([track_linear_cl[:, 0], track_linear_cl[:, 1]], k=3, s= 10, per=0)[:2]
     smooth_space= np.linspace(0.0, 1.0, math.ceil(s_track_cl[-1])*2)  # add more points to smooth the track
     track_smooth_cl= np.array(interpolate.splev(smooth_space, tck_cl)).T
     s_smooth_cl= np.cumsum(np.sqrt(np.sum(np.power(np.diff(track_smooth_cl[:, :2], axis=0), 2), axis=1)))
@@ -39,6 +39,8 @@ def smooth_track(track: np.ndarray) -> np.ndarray:
     step_smooth= 1
     num_point_smooth= math.ceil(s_smooth_cl[-1]/step_smooth)+1
     track_smooth_cl= np.array(interpolate.splev(np.linspace(0.0, 1.0, num_point_smooth), tck_cl)).T[:-1]
+    #s_smooth_cl = np.cumsum(np.sqrt(np.sum(np.power(np.diff(track_smooth_cl[:, :2], axis=0), 2), axis=1)))
+    #s_smooth_cl = np.insert(s_smooth_cl, 0, 0.0)
 
     #-------------------------------------------------------------------------------------------------------------------
     # Smooth n
@@ -74,7 +76,7 @@ def smooth_track(track: np.ndarray) -> np.ndarray:
 
     track_smooth= np.column_stack((track_smooth_cl, w_right_smooth[:-1], w_left_smooth[:-1]))
 
-    return track_smooth, s_smooth_cl
+    return track_smooth
 
 
 def dist2p(coeff: np.ndarray, track: list, p: np.ndarray):

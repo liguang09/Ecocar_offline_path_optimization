@@ -9,14 +9,22 @@ def mini_time(track: np.ndarray,
 
     num_point_track= track.shape[0]
     discr_point= np.arange(track.shape[0])
+    discr_point = np.append(discr_point, track.shape[0])
 
     h=1
     step= [i for i in range(discr_point.size)]
     N= step[-1]
 
+    kappa= np.append(kappa, kappa[0])
+    w_tr_right= np.append(track[:, 2], track[0, 2])
+    w_tr_left = np.append(track[:, 3], track[0, 3])
+
+
     kappa_interp= ca.interpolant('kappa_interp', 'linear', [step], kappa)
-    w_tr_right_interp= ca.interpolant('w_tr_right_interp', 'linear', [step], track[:, 2])
-    w_tr_left_interp= ca.interpolant('w_tr_left_interp', 'linear', [step], track[:, 3])
+    w_tr_right_interp= ca.interpolant('w_tr_right_interp', 'linear', [step], w_tr_right)
+    w_tr_left_interp= ca.interpolant('w_tr_left_interp', 'linear', [step], w_tr_left)
+
+
 
     # ------------------------------------------------------------------------------------------------------------------
     # DIRECT GAUSS-LEGENDRE COLLOCATION --------------------------------------------------------------------------------
