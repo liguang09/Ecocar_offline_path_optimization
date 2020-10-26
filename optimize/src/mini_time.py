@@ -2,7 +2,10 @@ import sys
 import time
 import numpy as np
 import casadi as ca
+from parameters import maximum
 from parameters import scale
+from parameters import veh
+from parameters import tire
 
 def mini_time(track: np.ndarray,
               kappa: np.ndarray) -> tuple:
@@ -122,11 +125,11 @@ def mini_time(track: np.ndarray,
     k_brake= 0.6
 
 
-    Fd= 0.5* Fd_coffe* v_s**2
+    Fd= 0.5* veh.Fd_coeff* v_s**2
     # Fl= 0.5* Fl_coffe* (v_s* np.cos(beta_s))**2
-    Fl = 0.5* Fl_coffe * (v_s*ca.cos(beta_s))** 2
+    Fl = 0.5* veh.Fl_coeff * (v_s*ca.cos(beta_s))** 2
 
-    Fx_fl= 0.5* k_drive* F_drive_s+ 0.5* k_brake* F_brake_s- 0.5*fr*m*g*(lr/L)
+    Fx_fl= 0.5* veh.k_drive* F_drive_s+ 0.5* veh.k_brake* F_brake_s- 0.5*veh.fr*veh.m*veh.g*(veh.lr/veh.L)
     Fx_fr= Fx_fl
     Fx_rl= 0.5* (1- k_drive)* F_drive_s+ 0.5* (1- k_brake)* F_brake_s- 0.5*fr*m*g*(lf/L)
     Fx_rr= Fx_rl
@@ -237,6 +240,9 @@ def mini_time(track: np.ndarray,
     ay_opt = []
     ec_opt = []
 
+    delta_p = []
+    F_p = []
+
     # boundary constraint: lift initial conditions
     Xk = ca.MX.sym('X0', nx)
     w.append(Xk)
@@ -306,7 +312,7 @@ def mini_time(track: np.ndarray,
         ec_opt.append(Xk[0]* scale.speed* Uk[1]* scale.F_drive* dt_opt[-1])
 
         # add new decision variables for state at end of the collocation interval
-        Xk = ca.MX.sym('X_'+ str(k + 1), nx)
+        Xk = ca.MX.sym('X_'+ str(k+ 1), nx)
         w.append(Xk)
         n_min = (-w_tr_right_interp(k + 1) + 3.4/ 2.0)/ scale.n
         n_max = (w_tr_left_interp(k + 1) - 3.4/ 2.0)/ scale.n
@@ -331,12 +337,37 @@ def mini_time(track: np.ndarray,
         # path constraint: limitied engine power
 
         # path constraint: Kamm's Circle for each wheel
+        mu=1
+        g.append(((f_x_flk / (mu * f_z_flk)) ** 2 + (f_y_flk / (mu * f_z_flk)) ** 2))
+        g.append(((f_x_frk / (mu * f_z_frk)) ** 2 + (f_y_frk / (mu * f_z_frk)) ** 2))
+        g.append(((f_x_rlk / (mu * f_z_rlk)) ** 2 + (f_y_rlk / (mu * f_z_rlk)) ** 2))
+        g.append(((f_x_rrk / (mu * f_z_rrk)) ** 2 + (f_y_rrk / (mu * f_z_rrk)) ** 2))
+        lbg.append([0.0] * 4)
+        ubg.append([1.0] * 4)
 
         # path constraint: lateral wheel load transfer
+        g.append(((f_y_flk + f_y_frk) * ca.cos(Uk[0] * scale.delta) + f_y_rlk + f_y_rrk
+                  +(f_x_flk + f_x_frk) * ca.sin(Uk[0] * scale.delta))* hcg/ ((twf + twr)/2)- Uk[3]* scale.gamma_y)
+
+        lbg.append([0.0])
+        ubg.append([0.0])
 
         # path constraint: f_drive * f_brake == 0 (no simultaneous operation of brake and accelerator pedal)
+        g.append(Uk[1] * Uk[2])
+        lbg.append([-2000.0/scale.F_drive * scale.F_brake])
+        ubg.append([0.0])
 
         # path constraint: actor dynamic
+        t_delta= 0.2
+        t_drive= 0.05
+        t_brake= 0.05
+
+        if k>0:
+            sigma = (1 - kappa_interp(k) * Xk[3] * scale.n) / (Xk[0] * scale.speed)
+            g.append((Uk- w[1 + (k - 1) * (nx - 0)]) / (h* sigma))
+            lbg.append([delta_min / (t_delta), -np.inf, f_brake_min/ (t_brake), -np.inf])
+            ubg.append([delta_max / (t_delta), f_drive_max/ (t_drive), np.inf, np.inf])
+
 
         # append outputs
         x_opt.append(Xk * x_sf)
