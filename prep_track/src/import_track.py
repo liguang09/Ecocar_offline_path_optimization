@@ -14,7 +14,7 @@ def import_track (file_path: str) -> np.ndarray:
     width_right= np.tile(width_right, lap)
     width_left= np.tile(width_left, lap)
 
-    track_raw= np.column_stack((center_line, width_right, width_left))
+    track_raw= np.column_stack((center_line, width_right, width_left)) # the track is open
 
     if reverse:
         track_raw= np.flipud(track_raw)
