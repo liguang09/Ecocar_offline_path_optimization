@@ -18,6 +18,9 @@ class Const(object):
 #=======================================================================================================================
 maximum= Const()
 maximum.speed= 25/3.6
+maximum.beta= 0.5 * np.pi
+maximum.omega= np.pi
+maximum.xi= np.pi
 
 maximum.delta= 15*np.pi/180
 maximum.F_drive= 5000 # not sure
@@ -37,10 +40,10 @@ track.width= 6.5
 scale = Const()
 # states
 scale.speed= maximum.speed
-scale.beta= 0.5* np.pi
-scale.omega= np.pi
+scale.beta= maximum.beta
+scale.omega= maximum.omega
 scale.n= track.width/2
-scale.xi= np.pi
+scale.xi= maximum.xi
 
 # control inputs
 scale.delta= maximum.delta
@@ -60,7 +63,7 @@ veh.g = 9.81
 veh.twf = 1.08
 veh.twr = 0.8
 veh.hcg = 0.20
-veh.width= 1.3*2
+veh.width= 1.3*3
 veh.length= 3.4
 veh.Izz = 0.2*veh.m*(np.power(veh.width,2)+ np.power(veh.length,2))
 
@@ -92,5 +95,5 @@ tire.Fz0 = 550
 #=======================================================================================================================
 act= Const()
 act.steerT= 0.2
-act.driveT= 0.05
-act.brakeT= 0.05
+act.driveT= 0.1
+act.brakeT= 0.1

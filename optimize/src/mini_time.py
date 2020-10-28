@@ -70,23 +70,23 @@ def mini_time(track: np.ndarray,
     # ------------------------------------------------------------------------------------------------------------------
     # State & Control Boundaries
     # ------------------------------------------------------------------------------------------------------------------
-    delta_min = -maximum.delta / scale.delta
-    delta_max = maximum.delta / scale.delta
+    delta_min = -1
+    delta_max = 1
     f_drive_min = 0.0
-    f_drive_max = maximum.F_drive / scale.F_drive
-    f_brake_min = -maximum.F_brake / scale.F_brake
+    f_drive_max = 1
+    f_brake_min = -1
     f_brake_max = 0.0
     gamma_y_min = -np.inf
     gamma_y_max = np.inf
 
     v_min = 0
-    v_max = maximum.speed / scale.speed
-    beta_min = -0.5 * np.pi / scale.beta
-    beta_max = 0.5 * np.pi / scale.beta
-    omega_z_min = -np.pi / scale.omega
-    omega_z_max = np.pi / scale.omega
-    xi_min = -np.pi / scale.xi
-    xi_max = np.pi / scale.xi
+    v_max = 1
+    beta_min = -1
+    beta_max = 1
+    omega_min = -1
+    omega_max = 1
+    xi_min = -1
+    xi_max = 1
 
     # ------------------------------------------------------------------------------------------------------------------
     # MODEL EQUATIONS
@@ -212,8 +212,8 @@ def mini_time(track: np.ndarray,
     n_min = (-w_tr_right_interp(0)+ veh.width/2) /scale.n
     n_max = (w_tr_left_interp(0)- veh.width/2)/ scale.n
 
-    lbw.append([v_min, beta_min, omega_z_min, n_min, xi_min])       # state lower bound
-    ubw.append([v_max, beta_max, omega_z_max, n_max, xi_max])       # state upper bound
+    lbw.append([v_min, beta_min, omega_min, n_min, xi_min])       # state lower bound
+    ubw.append([v_max, beta_max, omega_max, n_max, xi_max])       # state upper bound
     w0.append([v_initial, 0.0, 0.0, 0.0, 0.0])                      # state initial values
     x_opt.append(Xk* x_sf)
 
@@ -278,8 +278,8 @@ def mini_time(track: np.ndarray,
         n_min = (-w_tr_right_interp(k+ 1) + veh.width/2)/ scale.n
         n_max = (w_tr_left_interp(k+ 1) - veh.width/2)/ scale.n
 
-        lbw.append([v_min, beta_min, omega_z_min, n_min, xi_min])
-        ubw.append([v_max, beta_max, omega_z_max, n_max, xi_max])
+        lbw.append([v_min, beta_min, omega_min, n_min, xi_min])
+        ubw.append([v_max, beta_max, omega_max, n_max, xi_max])
         w0.append([v_initial, 0.0, 0.0, 0.0, 0.0])
 
         # add equality constraint
@@ -316,15 +316,15 @@ def mini_time(track: np.ndarray,
         ubg.append([0.0])'''
 
         # actuator
-
         if k>0:
             SFk = (1 -kappa_interp(k)* Xk[3]* scale.n)/ (Xk[0]* scale.speed* ca.cos(Xk[4]*scale.xi+ Xk[1]*scale.beta))
             g.append((Uk- w[1+(k - 1)* nx])/(h* SFk))
             lbg.append([delta_min/ (act.steerT), -np.inf, f_brake_min/ (act.brakeT), -np.inf])
             ubg.append([delta_max/ (act.steerT), f_drive_max/(act.driveT), np.inf, np.inf])
 
+        # limit corner speed
         if kappa_interp(k) !=0:
-            mu= 0.1
+            mu= 0.4
             g.append(ca.power(Xk[0]*scale.speed,2)* ca.fabs(kappa_interp(k))- mu* veh.g)
             lbg.append([-np.inf])
             ubg.append([0])
@@ -376,11 +376,9 @@ def mini_time(track: np.ndarray,
     nlp = {'f': J, 'x': w, 'g': g}
 
     # solver options
-    print_debug= False
     opts = {"expand": True,
-            "verbose": print_debug,
             "ipopt.max_iter": 3000,
-            "ipopt.tol": 1e-6}
+            "ipopt.tol": 1e-7}
 
     # create solver instance
     solver = ca.nlpsol("solver", "ipopt", nlp, opts)

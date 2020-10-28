@@ -3,7 +3,7 @@ import numpy as np
 def import_track (file_path: str) -> np.ndarray:
 
     track_csv_data= np.loadtxt(file_path, comments='#', delimiter=',')
-    lap= 1
+    lap= 2
     reverse= False
 
     center_line= track_csv_data[:, 0:2]
