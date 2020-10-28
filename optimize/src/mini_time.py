@@ -201,10 +201,6 @@ def mini_time(track: np.ndarray,
     ax_opt = []
     ay_opt = []
 
-
-    delta_p = []
-    F_p = []
-
     # boundary constraint: lift initial conditions
     Xk = ca.MX.sym('X0', nx)
     w.append(Xk)
@@ -217,9 +213,6 @@ def mini_time(track: np.ndarray,
     w0.append([v_initial, 0.0, 0.0, 0.0, 0.0])                      # state initial values
     x_opt.append(Xk* x_sf)
 
-    # loop along the racetrack and formulate path constraints & system dynamic
-    # retrieve step-sizes of optimization along reference line
-    # h = np.diff(s_opt)
     ds= h
     for k in range(N):
         # add decision variables for the control
@@ -240,7 +233,7 @@ def mini_time(track: np.ndarray,
 
             w0.append([v_initial, 0.0, 0.0, 0.0, 0.0])
 
-        # loop over all collocation points
+        # loop all collocation points
         Xk_end = D[0]* Xk
         sf_opt = []
 
@@ -270,7 +263,6 @@ def mini_time(track: np.ndarray,
 
         # calculate used energy
         dt_opt.append(sf_opt[0]+ sf_opt[1]+ sf_opt[2])
-        #ec_opt.append(Xk[0]* scale.speed* Uk[1]* scale.F_drive* dt_opt[-1])
 
         # add new decision variables for state at end of the collocation interval
         Xk= ca.MX.sym('X_'+ str(k+ 1), nx)
@@ -306,14 +298,13 @@ def mini_time(track: np.ndarray,
         # lateral wheel load transfer
         '''g.append(((f_y_flk + f_y_frk) * ca.cos(Uk[0] * scale.delta) + f_y_rlk + f_y_rrk
                   +(f_x_flk + f_x_frk) * ca.sin(Uk[0] * scale.delta))* veh.hcg/ ((veh.twf + veh.twr)/2)- Uk[3]* scale.gamma_y)
-
         lbg.append([0.0])
         ubg.append([0.0])'''
 
         # no simultaneous of brake and drive
-        '''g.append(Uk[1]* Uk[2])
-        lbg.append([0.0])
-        ubg.append([0.0])'''
+        g.append(Uk[1]* Uk[2])
+        lbg.append([0])
+        ubg.append([0.0])
 
         # actuator
         if k>0:
