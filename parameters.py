@@ -31,10 +31,11 @@ maximum.power= 20000 # not sure
 #=======================================================================================================================
 # Track
 #=======================================================================================================================
-track= Const()
-track.width= 6.5
-track.lap=1
-track.reverse= False
+trk = Const()
+trk.width= 6.5
+trk.lap=1
+trk.reverse= False
+trk.mu= 0.3
 
 #=======================================================================================================================
 # Scaling factors
@@ -44,7 +45,7 @@ scale = Const()
 scale.speed= maximum.speed
 scale.beta= maximum.beta
 scale.omega= maximum.omega
-scale.n= track.width/2
+scale.n= trk.width/2
 scale.xi= maximum.xi
 
 # control inputs
@@ -65,7 +66,7 @@ veh.g = 9.81
 veh.twf = 1.08
 veh.twr = 0.8
 veh.hcg = 0.20
-veh.width= 1.3*2
+veh.width= 1.3*2.5
 veh.length= 3.4
 veh.Izz = 0.2*veh.m*(np.power(veh.width,2)+ np.power(veh.length,2))
 
@@ -97,5 +98,5 @@ tire.Fz0 = 550
 #=======================================================================================================================
 act= Const()
 act.steerT= 0.2
-act.driveT= 0.01
-act.brakeT= 0.01
+act.driveT= 0.05
+act.brakeT= 0.05

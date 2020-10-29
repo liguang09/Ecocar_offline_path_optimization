@@ -56,21 +56,20 @@ t_orig= s_cumsum[-1]/maximum.speed
 #=======================================================================================================================
 # Crated optimized trajectory
 #=======================================================================================================================
+# optimized path
 opt_path= optimize.src.create_path.create_path(track= track_smooth_cl, devi= n_opt)
 
 opt_path_cl= np.vstack((opt_path[:, :2], opt_path[0, :2]))
+
+# optimized curvature
 #coeffs_x, coeffs_y, a_interp, normvec_interp = tph.calc_splines.calc_splines(path=track_smooth_xy_cl)
 coe_x_opt, coe_y_opt, _, _ = prep_track.src.spline_coeffs.spline_coeffs(track=opt_path_cl)
 spline_lengths_opt = tph.calc_spline_lengths.calc_spline_lengths(coeffs_x=coe_x_opt, coeffs_y=coe_y_opt)
 
 spline_lengths_opt= np.insert(spline_lengths_opt, 0, 0.0)
-
 kappa_opt= tph.calc_head_curv_num.calc_head_curv_num(path= opt_path_cl[:, :2],
                                                      el_lengths= spline_lengths_opt,
                                                      is_closed=True)[1]
-print(np.shape(kappa_opt))
-print(np.shape(spline_lengths_opt))
-
 
 #=======================================================================================================================
 # Plot result

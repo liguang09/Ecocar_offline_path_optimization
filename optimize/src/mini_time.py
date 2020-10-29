@@ -7,6 +7,7 @@ from parameters import scale
 from parameters import veh
 from parameters import tire
 from parameters import act
+from parameters import trk
 
 def mini_time(track: np.ndarray,
               kappa: np.ndarray) -> tuple:
@@ -26,8 +27,6 @@ def mini_time(track: np.ndarray,
     kappa_interp= ca.interpolant('kappa_interp', 'linear', [step], kappa)
     w_tr_right_interp= ca.interpolant('w_tr_right_interp', 'linear', [step], w_tr_right)
     w_tr_left_interp= ca.interpolant('w_tr_left_interp', 'linear', [step], w_tr_left)
-
-
 
     # ------------------------------------------------------------------------------------------------------------------
     # STATE VARIABLES
@@ -148,7 +147,7 @@ def mini_time(track: np.ndarray,
     # ------------------------------------------------------------------------------------------------------------------
     # INITIAL
     # ------------------------------------------------------------------------------------------------------------------
-    v_initial = 0.001
+    v_initial = 0.01
 
     # ------------------------------------------------------------------------------------------------------------------
     # FUNCTIONS
@@ -283,9 +282,10 @@ def mini_time(track: np.ndarray,
         axk, ayk = f_a(Xk, Uk)
 
         # limit engine power
-        '''g.append(Xk[0] * Uk[1])
+        '''g.append(Xk[0]*scale.speed * Uk[1]*scale.F_drive /maximum.power)
         lbg.append([0.0])
-        ubg.append([maximum.power/ (scale.F_drive * scale.speed)])'''
+        #ubg.append([maximum.power/ (scale.F_drive * scale.speed)])
+        ubg.append([1.0])'''
 
         # Kamm's Circle for each wheel
         '''g.append(((Fx_flk / (tire.mu * Fz_flk)) ** 2 + (Fy_flk / (tire.mu * Fz_flk)) ** 2))
@@ -302,8 +302,8 @@ def mini_time(track: np.ndarray,
         ubg.append([0.0])'''
 
         # no simultaneous of brake and drive
-        g.append(Uk[1]* Uk[2])
-        lbg.append([0])
+        g.append(Uk[1]*scale.F_brake* Uk[2]*scale.F_brake)
+        lbg.append([-1/5000])
         ubg.append([0.0])
 
         # actuator
@@ -314,11 +314,11 @@ def mini_time(track: np.ndarray,
             ubg.append([delta_max/ (act.steerT), f_drive_max/(act.driveT), np.inf, np.inf])
 
         # limit corner speed
+        #if ca.fabs(kappa_interp(k))>0.01:
         if kappa_interp(k) !=0:
-            mu= 0.4
-            g.append(ca.power(Xk[0]*scale.speed,2)* ca.fabs(kappa_interp(k))- mu* veh.g)
+            g.append(ca.power(Xk[0]*scale.speed, 2)* ca.fabs(kappa_interp(k))- trk.mu* veh.g)
             lbg.append([-np.inf])
-            ubg.append([0])
+            ubg.append([0.0])
 
         # append outputs
         x_opt.append(Xk* x_sf)
@@ -368,7 +368,7 @@ def mini_time(track: np.ndarray,
 
     # solver options
     opts = {"expand": True,
-            "ipopt.max_iter": 3000,
+            "ipopt.max_iter": 4000,
             "ipopt.tol": 1e-7}
 
     # create solver instance

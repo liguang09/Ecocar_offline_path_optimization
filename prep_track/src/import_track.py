@@ -1,5 +1,5 @@
 import numpy as np
-from parameters import track
+from parameters import trk
 
 def import_track (file_path: str) -> np.ndarray:
 
@@ -9,13 +9,13 @@ def import_track (file_path: str) -> np.ndarray:
     width_right= track_csv_data[:, 2]
     width_left= track_csv_data[:, 3]
 
-    center_line= np.tile(center_line, (track.lap, 1))
-    width_right= np.tile(width_right, track.lap)
-    width_left= np.tile(width_left, track.lap)
+    center_line= np.tile(center_line, (trk.lap, 1))
+    width_right= np.tile(width_right, trk.lap)
+    width_left= np.tile(width_left, trk.lap)
 
     track_raw= np.column_stack((center_line, width_right, width_left)) # the track is open
 
-    if track.reverse:
+    if trk.reverse:
         track_raw= np.flipud(track_raw)
 
     return track_raw
