@@ -18,24 +18,24 @@ class Const(object):
 #=======================================================================================================================
 maximum= Const()
 maximum.speed= 25/3.6
-maximum.beta= 0.5 * np.pi
+maximum.beta= np.pi/2
 maximum.omega= np.pi
 maximum.xi= np.pi
 
 maximum.delta= 15*np.pi/180
-maximum.F_drive= 5000 # not sure
-maximum.F_brake= 5000 # not sure
+maximum.F_drive= 545 # not sure
+maximum.F_brake= 450 # not sure
 
-maximum.power= 20000 # not sure
+#maximum.power= 200 # not sure
 
 #=======================================================================================================================
 # Track
 #=======================================================================================================================
 trk = Const()
 trk.width= 6.5
-trk.lap=1
+trk.lap= 1
 trk.reverse= False
-trk.mu= 0.3
+trk.mu= 0.4
 
 #=======================================================================================================================
 # Scaling factors
@@ -52,7 +52,7 @@ scale.xi= maximum.xi
 scale.delta= maximum.delta
 scale.F_drive= maximum.F_drive
 scale.F_brake= maximum.F_brake
-scale.gamma_y= 5000.0
+scale.gamma_y= 500.0
 
 #=======================================================================================================================
 # Vehicle parameters
@@ -61,20 +61,21 @@ veh= Const()
 veh.lf = 1.516/ 2
 veh.lr = 1.516/ 2
 veh.L = veh.lf + veh.lr
-veh.m = 139 + 70 # 139-> car net weight, 70-> estimated driver weight
+veh.m = 139 + 70                    # 139-> car net weight, 70-> estimated driver weight
 veh.g = 9.81
 veh.twf = 1.08
 veh.twr = 0.8
-veh.hcg = 0.20
-veh.width= 1.3*2.5
+veh.hcg = 0.167                     # Gravity center above ground
+veh.width= 1.3*2.5                  # multiply by a safety factor
 veh.length= 3.4
-veh.Izz = 0.2*veh.m*(np.power(veh.width,2)+ np.power(veh.length,2))
+veh.wheelR= 0.55/2
+veh.Izz = 0.5* veh.m* veh.wheelR**2
 
 
-veh.Fd_coeff = 0.14
-veh.Fl_coeff = 0.5 # not sure
-veh.fr = 0.013 # not sure
-veh.k_roll = 0.5 # not sure
+veh.Fd_coeff = 0.274                # drag coefficient
+veh.Fl_coeff = 0.01                # lift coefficient
+veh.Fr_coeff = 0.016                # static rolling resistance coefficient
+veh.k_roll = 0.5                    # suspension related roll balance relationship
 
 veh.k_drive= 0
 veh.k_brake= 0.5
@@ -82,16 +83,12 @@ veh.k_brake= 0.5
 # Tire
 #=======================================================================================================================
 tire= Const() # not sure
-tire.mu= 1.0
-tire.eps_f = -0.1
-tire.eps_r = -0.1
-tire.Cf = 2.5
-tire.Cr = 2.5
-tire.Bf = 1.65
-tire.Br = 1.65
-tire.Ef = 1.0
-tire.Er = 1.0
-tire.Fz0 = 550
+tire.mu= 0.0025
+tire.eps= 0 #-0.1
+tire.C= 0 #1.65
+tire.B = 0 #0.0822
+tire.E = 0 #1.0
+tire.Fz0 = 515                      # mg/4
 
 #=======================================================================================================================
 # Actuator constant

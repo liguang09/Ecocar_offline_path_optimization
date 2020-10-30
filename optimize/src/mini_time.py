@@ -95,13 +95,13 @@ def mini_time(track: np.ndarray,
     #Fl = 0.5 * veh.Fl_coeff * v_s ** 2
 
     # tire x dimension
-    Fx_fl= 0.5* veh.k_drive* F_drive_s+ 0.5* veh.k_brake* F_brake_s- 0.5*veh.fr*veh.m*veh.g*(veh.lr/veh.L)
+    Fx_fl= 0.5* veh.k_drive* F_drive_s+ 0.5* veh.k_brake* F_brake_s- 0.5*veh.Fr_coeff*veh.m*veh.g*(veh.lr/veh.L)
     Fx_fr= Fx_fl
-    Fx_rl= 0.5* (1- veh.k_drive)* F_drive_s+ 0.5* (1- veh.k_brake)* F_brake_s- 0.5*veh.fr*veh.m*veh.g*(veh.lf/veh.L)
+    Fx_rl= 0.5* (1- veh.k_drive)* F_drive_s+ 0.5* (1- veh.k_brake)* F_brake_s- 0.5*veh.Fr_coeff*veh.m*veh.g*(veh.lf/veh.L)
     Fx_rr= Fx_rl
 
     # tire z dimension
-    Fx_est= F_drive_s+ F_brake_s- Fd- veh.fr* veh.m* veh.g
+    Fx_est= F_drive_s+ F_brake_s- Fd- veh.Fr_coeff* veh.m* veh.g
     Fz_fl= 0.5* veh.m* veh.g* (veh.lr/veh.L)- 0.5* (veh.hcg/veh.L)* Fx_est- gamma_y_s* veh.k_roll+ 0.5* Fl
     Fz_fr= 0.5* veh.m* veh.g* (veh.lr/veh.L)- 0.5* (veh.hcg/veh.L)* Fx_est+ gamma_y_s* veh.k_roll+ 0.5* Fl
     Fz_rl= 0.5* veh.m* veh.g* (veh.lr/veh.L)+ 0.5* (veh.hcg/veh.L)* Fx_est- gamma_y_s* (1-veh.k_roll)+0.5* Fl
@@ -114,10 +114,11 @@ def mini_time(track: np.ndarray,
     alpha_rr= ca.atan((veh.lr* omega_s- v_s* ca.sin(beta_s))/ (v_s* ca.cos(beta_s)+ 0.5* veh.twr* omega_s))
 
     # Pacejka's magic formula for Fy
-    Fy_fl= tire.mu* Fz_fl* (1+ tire.eps_f* Fz_fl/ tire.Fz0)* ca.sin(tire.Cf* ca.atan(tire.Bf* alpha_fl- tire.Ef*(tire.Bf* alpha_fl- ca.atan(tire.Bf* alpha_fl))))
-    Fy_fr= tire.mu* Fz_fr* (1+ tire.eps_f* Fz_fr/ tire.Fz0)* ca.sin(tire.Cf* ca.atan(tire.Bf* alpha_fr- tire.Ef*(tire.Bf* alpha_fr- ca.atan(tire.Bf* alpha_fr))))
-    Fy_rl= tire.mu* Fz_rl* (1+ tire.eps_r* Fz_rl/ tire.Fz0)* ca.sin(tire.Cr* ca.atan(tire.Br* alpha_rl- tire.Er*(tire.Br* alpha_rl- ca.atan(tire.Br* alpha_rl))))
-    Fy_rr= tire.mu* Fz_rr* (1+ tire.eps_r* Fz_rr/ tire.Fz0)* ca.sin(tire.Cr* ca.atan(tire.Br* alpha_rr- tire.Er*(tire.Br* alpha_rr- ca.atan(tire.Br* alpha_rr))))
+    Fy_fl= tire.mu* Fz_fl* (1+ tire.eps* Fz_fl/ tire.Fz0)* ca.sin(tire.C* ca.atan(tire.B* alpha_fl- tire.E*(tire.B* alpha_fl- ca.atan(tire.B* alpha_fl))))
+    Fy_fr= tire.mu* Fz_fr* (1+ tire.eps* Fz_fr/ tire.Fz0)* ca.sin(tire.C* ca.atan(tire.B* alpha_fr- tire.E*(tire.B* alpha_fr- ca.atan(tire.B* alpha_fr))))
+    Fy_rl= tire.mu* Fz_rl* (1+ tire.eps* Fz_rl/ tire.Fz0)* ca.sin(tire.C* ca.atan(tire.B* alpha_rl- tire.E*(tire.B* alpha_rl- ca.atan(tire.B* alpha_rl))))
+    Fy_rr= tire.mu* Fz_rr* (1+ tire.eps* Fz_rr/ tire.Fz0)* ca.sin(tire.C* ca.atan(tire.B* alpha_rr- tire.E*(tire.B* alpha_rr- ca.atan(tire.B* alpha_rr))))
+
 
     # Fx, Fy, Mz
     Fx= (Fx_fl+ Fx_fr)* ca.cos(delta_s)- (Fy_fl+ Fy_fr)* ca.sin(delta_s)+ (Fx_rl+ Fx_rr)
@@ -266,8 +267,8 @@ def mini_time(track: np.ndarray,
         # add new decision variables for state at end of the collocation interval
         Xk= ca.MX.sym('X_'+ str(k+ 1), nx)
         w.append(Xk)
-        n_min = (-w_tr_right_interp(k+ 1) + veh.width/2)/ scale.n
-        n_max = (w_tr_left_interp(k+ 1) - veh.width/2)/ scale.n
+        n_min = (-w_tr_right_interp(k+1) + veh.width/2)/ scale.n
+        n_max = (w_tr_left_interp(k+1) - veh.width/2)/ scale.n
 
         lbw.append([v_min, beta_min, omega_min, n_min, xi_min])
         ubw.append([v_max, beta_max, omega_max, n_max, xi_max])
@@ -398,19 +399,16 @@ def mini_time(track: np.ndarray,
 
     x_opt, u_opt, dt_opt, ax_opt, ay_opt= f_sol(sol['x'])
 
-    # solution for state variables
+
     x_opt = np.reshape(x_opt, (N + 1, nx))
 
-    # solution for control variables
     u_opt = np.reshape(u_opt, (N, nu))
 
-    # solution for time
     t_opt = np.hstack((0.0, np.cumsum(dt_opt)))
 
-    # solution for acceleration
-    ax_opt = np.append(ax_opt[-1], ax_opt)
-    ay_opt = np.append(ay_opt[-1], ay_opt)
-    atot_opt = np.sqrt(np.power(ax_opt, 2) + np.power(ay_opt, 2))
+    #ax_opt = np.append(ax_opt[-1], ax_opt)
+    #ay_opt = np.append(ay_opt[-1], ay_opt)
+    #atot_opt = np.sqrt(np.power(ax_opt, 2) + np.power(ay_opt, 2))
 
     # solution for energy consumption
     #ec_opt_cum = np.hstack((0.0, np.cumsum(ec_opt))) / 3600.0
