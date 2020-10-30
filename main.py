@@ -49,8 +49,11 @@ kappa= tph.calc_head_curv_num.calc_head_curv_num(path= track_smooth_cl[:, :2],
 #=======================================================================================================================
 # Call Optimization
 #=======================================================================================================================
-n_opt, v_opt, u_opt, t_opt= optimize.src.mini_time.mini_time(track= track_smooth_cl, kappa= kappa)
+#%% Start Optimization
+x_opt, u_opt, t_opt= optimize.src.mini_time.mini_time(track= track_smooth_cl, kappa= kappa)
 
+n_opt= -x_opt[:-1, 3]
+v_opt= x_opt[:-1, 0]
 t_orig= s_cumsum[-1]/maximum.speed
 
 #=======================================================================================================================
@@ -72,8 +75,23 @@ kappa_opt= tph.calc_head_curv_num.calc_head_curv_num(path= opt_path_cl[:, :2],
                                                      is_closed=True)[1]
 
 #=======================================================================================================================
+# Export result
+#=======================================================================================================================
+optimize.src.save_results.save_results(trajectory_opt=opt_path_cl,
+                                       track_smooth= track_smooth_xy_cl,
+                                       s_opt= spline_lengths_opt,
+                                       t_opt= t_opt,
+                                       x_opt= x_opt,
+                                       u_opt= u_opt,
+                                       kappa_opt= kappa_opt,
+                                       s_center= spline_lengths,
+                                       kappa_center= kappa)
+
+
+#=======================================================================================================================
 # Plot result
 #=======================================================================================================================
+#%% Plot
 track_outer_data = np.loadtxt(file_paths["track_outer_file"], comments='#', delimiter=',')
 track_inner_data = np.loadtxt(file_paths["track_inner_file"], comments='#', delimiter=',')
 
@@ -85,22 +103,6 @@ plt.plot(track_smooth_cl[:,0], track_smooth_cl[:,1], 'r-', linewidth=0.7)
 plt.plot(track_outer_data[:,0], track_outer_data[:,1], 'r-', linewidth= 0.7)
 plt.plot(track_inner_data[:,0], track_inner_data[:,1], 'r-', linewidth= 0.7)
 plt.plot(opt_path[:,0], opt_path[:,1], 'b-', linewidth=0.7)
-
-plt.figure()
-plt.plot(s_cumsum, v_opt/scale.speed, 'r')
-plt.plot(np.cumsum(spline_lengths_opt), kappa_opt, 'b')
-plt.plot(s_cumsum, kappa)
-plt.title('Speed & Curvature')
-
-plt.figure()
-plt.plot( s_cumsum, u_opt[:, 0]/scale.delta,'g')
-plt.plot(s_cumsum, kappa)
-plt.title('Steer Angle & Curvature')
-
-plt.figure()
-plt.plot(s_cumsum, u_opt[:, 1]/scale.F_drive, 'b')
-plt.plot(s_cumsum, u_opt[:, 2]/scale.F_brake)
-plt.title('Drive & Brake Effort')
 
 plt.show()
 

@@ -413,7 +413,7 @@ def mini_time(track: np.ndarray,
     # solution for energy consumption
     #ec_opt_cum = np.hstack((0.0, np.cumsum(ec_opt))) / 3600.0
 
-    return -x_opt[:-1, 3], x_opt[:-1, 0], u_opt, t_opt
+    return  x_opt, u_opt, t_opt
 
 
 # testing --------------------------------------------------------------------------------------------------------------
