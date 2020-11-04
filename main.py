@@ -7,7 +7,6 @@ import trajectory_planning_helpers as tph
 from parameters import maximum
 from parameters import scale
 
-
 file_paths= {}
 file_paths["module"] = os.path.dirname(os.path.abspath(__file__))
 file_paths["track_file"] = os.path.join(file_paths["module"], "tracks", "london_track" + ".csv")
@@ -28,14 +27,14 @@ track_smooth_cl= prep_track.src.smooth_track.smooth_track(track_raw)
 # Calculate lengths
 #=======================================================================================================================
 # use Euclidean distance directly
-s_cumsum, s_seg= prep_track.src.track_length.track_length((track_smooth_cl[:, :2]))
+s_cumsum, s_seg= prep_track.src.track_length.track_length((track_raw[:, :2]))
 s_cumsum= np.insert(s_cumsum, 0, 0.0)
 s_seg= np.insert(s_seg, 0, 0.0)
 
 # via spline equations
 track_smooth_xy_cl= np.vstack((track_smooth_cl[:, :2], track_smooth_cl[0, :2]))
 
-#coeffs_x, coeffs_y, a_interp, normvec_interp = tph.calc_splines.calc_splines(path=track_smooth_xy_cl)
+# coeffs_x, coeffs_y, a_interp, normvec_interp = tph.calc_splines.calc_splines(path=track_smooth_xy_cl)
 coeffs_x, coeffs_y, a_interp, normvec_interp = prep_track.src.spline_coeffs.spline_coeffs(track=track_smooth_xy_cl)
 spline_lengths = tph.calc_spline_lengths.calc_spline_lengths(coeffs_x=coeffs_x, coeffs_y=coeffs_y)
 #=======================================================================================================================
@@ -65,7 +64,7 @@ opt_path= optimize.src.create_path.create_path(track= track_smooth_cl, devi= n_o
 opt_path_cl= np.vstack((opt_path[:, :2], opt_path[0, :2]))
 
 # optimized curvature
-#coeffs_x, coeffs_y, a_interp, normvec_interp = tph.calc_splines.calc_splines(path=track_smooth_xy_cl)
+# coe_x_opt, coe_y_opt, a_interp, normvec_interp = tph.calc_splines.calc_splines(path=track_smooth_xy_cl)
 coe_x_opt, coe_y_opt, _, _ = prep_track.src.spline_coeffs.spline_coeffs(track=opt_path_cl)
 spline_lengths_opt = tph.calc_spline_lengths.calc_spline_lengths(coeffs_x=coe_x_opt, coeffs_y=coe_y_opt)
 
@@ -108,4 +107,6 @@ plt.show()
 
 print('original lap time:', t_orig,'s')
 print('optimized lap time:', t_opt[-1],'s')
+print('original center length: ', s_cumsum[-1])
+print('optimized center length: ', np.cumsum(spline_lengths_opt)[-1])
 print('optimized average speed:', np.average(v_opt), 'm/s')

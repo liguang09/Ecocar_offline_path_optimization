@@ -12,7 +12,6 @@ class Const(object):
             raise self.ConstError("Can't change const.%s" % name)
         self.__dict__[name] = value
 
-
 #=======================================================================================================================
 # maximum values
 #=======================================================================================================================
@@ -22,20 +21,21 @@ maximum.beta= np.pi/2
 maximum.omega= np.pi
 maximum.xi= np.pi
 
-maximum.delta= 15*np.pi/180
-maximum.F_drive= 545 # not sure
-maximum.F_brake= 450 # not sure
+maximum.delta= np.deg2rad(15)     # 15*pi/180
+maximum.F_drive= 1091    # 150Nm/R* 2 tires
+maximum.F_brake= 1800    # from brake system report
 
 #maximum.power= 200 # not sure
 
 #=======================================================================================================================
 # Track
 #=======================================================================================================================
-trk = Const()
+trk= Const()
 trk.width= 6.5
+trk.mu= 1
+
 trk.lap= 1
 trk.reverse= False
-trk.mu= 0.4
 
 #=======================================================================================================================
 # Scaling factors
@@ -60,34 +60,45 @@ scale.gamma_y= 500.0
 veh= Const()
 veh.lf = 1.516/ 2
 veh.lr = 1.516/ 2
-veh.L = veh.lf + veh.lr
-veh.m = 139 + 70                    # 139-> car net weight, 70-> estimated driver weight
+veh.L = 1.516
+veh.m = 139+ 70                    # 139-> car net weight, 70-> estimated driver weight
 veh.g = 9.81
 veh.twf = 1.08
 veh.twr = 0.8
 veh.hcg = 0.167                     # Gravity center above ground
-veh.width= 1.3*2.5                  # multiply by a safety factor
-veh.length= 3.4
 veh.wheelR= 0.55/2
-veh.Izz = 0.5* veh.m* veh.wheelR**2
+veh.length= 3.4
+veh.width= 1.3*1.0                   # multiply by a safety factor
 
+veh.Izz = 0.2* veh.m*(3.4**2+1.3**2)
 
-veh.Fd_coeff = 0.274                # drag coefficient
-veh.Fl_coeff = 0.01                # lift coefficient
-veh.Fr_coeff = 0.016                # static rolling resistance coefficient
 veh.k_roll = 0.5                    # suspension related roll balance relationship
-
 veh.k_drive= 0
 veh.k_brake= 0.5
+
+#=======================================================================================================================
+# Resistance
+#=======================================================================================================================
+resist= Const()
+
+resist.rho= 1.15
+resist.A= 1.7577
+resist.Cd= 0.14         #0.4254       #0.0693         # drag coefficient, from DTU webpage
+resist.Cr= 0.0025       #0.016          # static rolling resistance coefficient, from wiki
+resist.Cl= 0.2474                       # lift coefficient
+
 #=======================================================================================================================
 # Tire
 #=======================================================================================================================
-tire= Const() # not sure
-tire.mu= 0.0025
-tire.eps= 0 #-0.1
-tire.C= 0 #1.65
-tire.B = 0 #0.0822
-tire.E = 0 #1.0
+tire= Const()
+tire.mu= trk.mu
+a= 0.5
+
+# Pacejka parameters
+tire.eps= -0.1*a        #-0.1
+tire.C= 2.5*a           #2.5
+tire.B = 10.0*a         #10
+tire.E = 0.5*a          #0.5
 tire.Fz0 = 515                      # mg/4
 
 #=======================================================================================================================

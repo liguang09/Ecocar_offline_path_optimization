@@ -1,6 +1,8 @@
 import numpy as np
 import os
 
+# this function saves the optimized results into csv format, for plotting and analysis
+
 def save_results(trajectory_opt: np.ndarray,
                  track_smooth: np.ndarray,
                  s_opt: np.ndarray,
@@ -28,7 +30,7 @@ def save_results(trajectory_opt: np.ndarray,
     fmt_x= "%.5f; %.5f; %.5f; %.5f; %.5f"
     np.savetxt(os.path.join(export_path, 'states.csv'), x_opt, fmt=fmt_x, header=header_x)
 
-    header_u= "delta; F_drive; F_brake_N; gamma_y"
+    header_u= "delta; F_drive; F_brake; gamma_y"
     fmt_u = "%.5f; %.5f; %.5f; %.5f"
     np.savetxt(os.path.join(export_path, 'ctrl_inputs.csv'), u_opt, fmt=fmt_u, header=header_u)
 

@@ -2,12 +2,13 @@ import sys
 import time
 import numpy as np
 import casadi as ca
-from parameters import maximum
 from parameters import scale
 from parameters import veh
 from parameters import tire
 from parameters import act
 from parameters import trk
+from parameters import resist
+from parameters import maximum
 
 def mini_time(track: np.ndarray,
               kappa: np.ndarray) -> tuple:
@@ -16,7 +17,7 @@ def mini_time(track: np.ndarray,
     discr_point= np.arange(track.shape[0])
     discr_point = np.append(discr_point, track.shape[0])
 
-    h=1
+    h= 1    # optimized step
     step= [i for i in range(discr_point.size)]
     N= step[-1]
 
@@ -32,11 +33,11 @@ def mini_time(track: np.ndarray,
     # STATE VARIABLES
     # ------------------------------------------------------------------------------------------------------------------
     # States variables
-    v = ca.SX.sym('v')  # velocity
-    beta = ca.SX.sym('beta')  # slip angle
-    omega = ca.SX.sym('omega')  # yaw rate
-    n = ca.SX.sym('n')  # lateral distance to ref line (left:+)
-    xi = ca.SX.sym('xi')  # relative angle to tangent on ref line
+    v = ca.SX.sym('v')
+    beta = ca.SX.sym('beta')
+    omega = ca.SX.sym('omega')
+    n = ca.SX.sym('n')
+    xi = ca.SX.sym('xi')
 
     x = ca.vertcat(v, beta, omega, n, xi)
     nx= x.size()[0]
@@ -69,43 +70,50 @@ def mini_time(track: np.ndarray,
     # ------------------------------------------------------------------------------------------------------------------
     # State & Control Boundaries
     # ------------------------------------------------------------------------------------------------------------------
-    delta_min = -1
-    delta_max = 1
+    delta_min = -1.0
+    delta_max = 1.0
     f_drive_min = 0.0
-    f_drive_max = 1
-    f_brake_min = -1
+    f_drive_max = 1.0
+    f_brake_min = -1.0
     f_brake_max = 0.0
     gamma_y_min = -np.inf
     gamma_y_max = np.inf
 
-    v_min = 0
-    v_max = 1
-    beta_min = -1
-    beta_max = 1
-    omega_min = -1
-    omega_max = 1
-    xi_min = -1
-    xi_max = 1
+    v_min = 0.0
+    v_max = 1.0
+    beta_min = -1.0
+    beta_max = 1.0
+    omega_min = -1.0
+    omega_max = 1.0
+    xi_min = -1.0
+    xi_max = 1.0
 
     # ------------------------------------------------------------------------------------------------------------------
-    # MODEL EQUATIONS
+    # Vehicle Model
     # ------------------------------------------------------------------------------------------------------------------
-    Fd= 0.5* veh.Fd_coeff* v_s**2
-    Fl = 0.5* veh.Fl_coeff * (v_s*ca.cos(beta_s))** 2
-    #Fl = 0.5 * veh.Fl_coeff * v_s ** 2
+    # drag force
+    Fd= 0.5* resist.rho* resist.A* resist.Cd* v_s**2
+
+    # Rolling resistance
+    Fr = resist.Cr * veh.m * veh.g / veh.wheelR * 4
+
+    # Down force
+    #Fl = 0.5* resist.rho* resist.A* resist.Cl* v_s** 2
+    Fl= 0.5* resist.rho* resist.A* resist.Cl* (v_s*ca.cos(beta_s))** 2
+
 
     # tire x dimension
-    Fx_fl= 0.5* veh.k_drive* F_drive_s+ 0.5* veh.k_brake* F_brake_s- 0.5*veh.Fr_coeff*veh.m*veh.g*(veh.lr/veh.L)
+    Fx_fl= 0.5* veh.k_drive* F_drive_s+ 0.5* veh.k_brake* F_brake_s- 0.5*(Fr)*(veh.lr/veh.L)
     Fx_fr= Fx_fl
-    Fx_rl= 0.5* (1- veh.k_drive)* F_drive_s+ 0.5* (1- veh.k_brake)* F_brake_s- 0.5*veh.Fr_coeff*veh.m*veh.g*(veh.lf/veh.L)
+    Fx_rl= 0.5* (1- veh.k_drive)* F_drive_s+ 0.5* (1- veh.k_brake)* F_brake_s- 0.5*(Fr)*(veh.lf/veh.L)
     Fx_rr= Fx_rl
 
     # tire z dimension
-    Fx_est= F_drive_s+ F_brake_s- Fd- veh.Fr_coeff* veh.m* veh.g
+    Fx_est= F_drive_s+ F_brake_s- Fd- Fr
     Fz_fl= 0.5* veh.m* veh.g* (veh.lr/veh.L)- 0.5* (veh.hcg/veh.L)* Fx_est- gamma_y_s* veh.k_roll+ 0.5* Fl
     Fz_fr= 0.5* veh.m* veh.g* (veh.lr/veh.L)- 0.5* (veh.hcg/veh.L)* Fx_est+ gamma_y_s* veh.k_roll+ 0.5* Fl
-    Fz_rl= 0.5* veh.m* veh.g* (veh.lr/veh.L)+ 0.5* (veh.hcg/veh.L)* Fx_est- gamma_y_s* (1-veh.k_roll)+0.5* Fl
-    Fz_rr= 0.5* veh.m* veh.g* (veh.lr/veh.L)+ 0.5* (veh.hcg/veh.L)* Fx_est+ gamma_y_s* (1-veh.k_roll)+0.5* Fl
+    Fz_rl= 0.5* veh.m* veh.g* (veh.lr/veh.L)+ 0.5* (veh.hcg/veh.L)* Fx_est- gamma_y_s* (1-veh.k_roll)+ 0.5* Fl
+    Fz_rr= 0.5* veh.m* veh.g* (veh.lr/veh.L)+ 0.5* (veh.hcg/veh.L)* Fx_est+ gamma_y_s* (1-veh.k_roll)+ 0.5* Fl
 
     # tire y dimension
     alpha_fl= delta_s- ca.atan((veh.lf* omega_s+ v_s* ca.sin(beta_s))/ (v_s* ca.cos(beta_s)- 0.5* veh.twf* omega_s))
@@ -114,49 +122,51 @@ def mini_time(track: np.ndarray,
     alpha_rr= ca.atan((veh.lr* omega_s- v_s* ca.sin(beta_s))/ (v_s* ca.cos(beta_s)+ 0.5* veh.twr* omega_s))
 
     # Pacejka's magic formula for Fy
-    Fy_fl= tire.mu* Fz_fl* (1+ tire.eps* Fz_fl/ tire.Fz0)* ca.sin(tire.C* ca.atan(tire.B* alpha_fl- tire.E*(tire.B* alpha_fl- ca.atan(tire.B* alpha_fl))))
-    Fy_fr= tire.mu* Fz_fr* (1+ tire.eps* Fz_fr/ tire.Fz0)* ca.sin(tire.C* ca.atan(tire.B* alpha_fr- tire.E*(tire.B* alpha_fr- ca.atan(tire.B* alpha_fr))))
-    Fy_rl= tire.mu* Fz_rl* (1+ tire.eps* Fz_rl/ tire.Fz0)* ca.sin(tire.C* ca.atan(tire.B* alpha_rl- tire.E*(tire.B* alpha_rl- ca.atan(tire.B* alpha_rl))))
-    Fy_rr= tire.mu* Fz_rr* (1+ tire.eps* Fz_rr/ tire.Fz0)* ca.sin(tire.C* ca.atan(tire.B* alpha_rr- tire.E*(tire.B* alpha_rr- ca.atan(tire.B* alpha_rr))))
-
+    Fy_fl= tire.mu* Fz_fl* (1+ tire.eps* Fz_fl/ tire.Fz0)* \
+           ca.sin(tire.C* ca.atan(tire.B* alpha_fl- tire.E*(tire.B* alpha_fl- ca.atan(tire.B* alpha_fl))))
+    Fy_fr= tire.mu* Fz_fr* (1+ tire.eps* Fz_fr/ tire.Fz0)* \
+           ca.sin(tire.C* ca.atan(tire.B* alpha_fr- tire.E*(tire.B* alpha_fr- ca.atan(tire.B* alpha_fr))))
+    Fy_rl= tire.mu* Fz_rl* (1+ tire.eps* Fz_rl/ tire.Fz0)* \
+           ca.sin(tire.C* ca.atan(tire.B* alpha_rl- tire.E*(tire.B* alpha_rl- ca.atan(tire.B* alpha_rl))))
+    Fy_rr= tire.mu* Fz_rr* (1+ tire.eps* Fz_rr/ tire.Fz0)* \
+           ca.sin(tire.C* ca.atan(tire.B* alpha_rr- tire.E*(tire.B* alpha_rr- ca.atan(tire.B* alpha_rr))))
 
     # Fx, Fy, Mz
     Fx= (Fx_fl+ Fx_fr)* ca.cos(delta_s)- (Fy_fl+ Fy_fr)* ca.sin(delta_s)+ (Fx_rl+ Fx_rr)
     Fy= (Fx_fl+ Fx_fr)* ca.sin(delta_s)+ (Fy_fl+ Fy_fr)* ca.cos(delta_s)+ (Fy_rl+ Fy_rr)
-    Mz= ((Fx_rr- Fx_rl)* veh.twr/2- (Fy_rl+ Fy_rr)* veh.lr+
-                        ((Fx_fr- Fx_fl)* ca.cos(delta_s)+ (Fy_fl- Fy_fr)* ca.sin(delta_s))* veh.twf/2+
-                        ((Fy_fl+ Fy_fr)* ca.cos(delta_s)+ (Fx_fl+ Fx_fr)* ca.sin(delta_s))* veh.lf)
+    Mz= (Fx_rr- Fx_rl)* veh.twr/2- (Fy_rl+ Fy_rr)* veh.lr+\
+        ((Fx_fr- Fx_fl)* ca.cos(delta_s)+ (Fy_fl- Fy_fr)* ca.sin(delta_s))* \
+        veh.twf/2+((Fy_fl+ Fy_fr)* ca.cos(delta_s)+ (Fx_fl+ Fx_fr)* ca.sin(delta_s))* veh.lf
 
-    # longitudinal acceleration [m/s²]
-    ax = (Fx_rl+ Fx_rr+ (Fx_fl+ Fx_fr)* ca.cos(delta_s)- (Fy_fl+ Fy_fr)* ca.sin(delta_s)- Fd)/veh.m
-
-    # lateral acceleration [m/s²]
-    ay = ((Fx_fl+ Fx_fr)* ca.sin(delta_s)+ Fy_rl+ Fy_rr+ (Fy_fl+ Fy_fr)* ca.cos(delta_s))/ veh.m
+    '''Mz = (Fx_rl - Fx_rr) * veh.twr/ 2 - (Fy_rl + Fy_rr) * veh.lr +\
+         ((Fx_fl - Fx_fr) * ca.cos(delta_s) + (Fy_fl - Fy_fr) * ca.sin(delta_s)) * veh.twf / 2 +\
+         ((Fy_fl + Fy_fr) * ca.cos(delta_s) + (Fx_fl + Fx_fr) * ca.sin(delta_s)) * veh.lf'''
 
     k_curv = ca.SX.sym("k_curv")
 
     # Derivatives
-    SF= (1.0- n_s* k_curv)/(v_s* ca.cos(xi_s+ beta_s))
-    dv= SF* (Fx* ca.cos(beta_s)+ Fy* ca.sin(beta_s)- Fd)/veh.m
-    dbeta= SF* (omega_s+ (Fy* ca.cos(beta_s)- Fx* ca.sin(beta_s))/(veh.m* v_s))
+    SF= (1.0- n_s* k_curv)/(v_s* ca.cos(xi_s+ beta_s)) #dt/ds
+
+    dn = SF* v_s* ca.sin(xi_s + beta_s)
+    dxi = SF* omega_s- k_curv
+    dv= SF* (Fx* ca.cos(beta_s)+ Fy* ca.sin(beta_s)- Fd*ca.cos(beta_s))/veh.m
+    dbeta= SF* (omega_s+ (Fy* ca.cos(beta_s)- Fx* ca.sin(beta_s)+Fd*ca.sin(beta_s))/(veh.m* v_s))
     domega= SF* Mz/ veh.Izz
-    dn= SF* v_s* ca.sin(xi_s+ beta_s)
-    dxi= SF* omega_s- k_curv
 
     dx = ca.vertcat(dv, dbeta, domega, dn, dxi)/x_sf
 
-    # ------------------------------------------------------------------------------------------------------------------
-    # INITIAL
-    # ------------------------------------------------------------------------------------------------------------------
-    v_initial = 0.01
+    v_initial = 0.1
 
     # ------------------------------------------------------------------------------------------------------------------
     # FUNCTIONS
     # ------------------------------------------------------------------------------------------------------------------
-    # continuous time dynamics
     f_dyn= ca.Function('f_dyn', [x, u, k_curv], [dx, SF], ['x', 'u', 'k_curv'], ['dx', 'SF'])
-    f_a = ca.Function('f_a', [x, u], [ax, ay], ['x', 'u'], ['ax', 'ay'])
+    # f_a = ca.Function('f_a', [x, u], [ax, ay], ['x', 'u'], ['ax', 'ay'])
 
+    f_fx = ca.Function('f_fx', [x, u], [Fx_fl, Fx_fr, Fx_rl, Fx_rr], ['x', 'u'], ['Fx_fl', 'Fx_fr', 'Fx_rl', 'Fx_rr'])
+    f_fy = ca.Function('f_fy', [x, u], [Fy_fl, Fy_fr, Fy_rl, Fy_rr], ['x', 'u'], ['Fy_fl', 'Fy_fr', 'Fy_rl', 'Fy_rr'])
+    f_fz = ca.Function('f_fz', [x, u], [Fz_fl, Fz_fr, Fz_rl, Fz_rr], ['x', 'u'], ['Fz_fl', 'Fz_fr', 'Fz_rl', 'Fz_rr'])
+    f_Fxy= ca.Function('f_Fxy',[x, u], [Fx, Fy], ['x', 'u'], ['Fx', 'Fy'])
     # ------------------------------------------------------------------------------------------------------------------
     # DIRECT GAUSS-LEGENDRE COLLOCATION
     # ------------------------------------------------------------------------------------------------------------------
@@ -182,7 +192,7 @@ def mini_time(track: np.ndarray,
         B[i] = intp(1.0)
 
     # ------------------------------------------------------------------------------------------------------------------
-    # Build NLP solver
+    # NLP solver
     # ------------------------------------------------------------------------------------------------------------------
     # initialize NLP vectors
     w = []      # store states
@@ -201,16 +211,20 @@ def mini_time(track: np.ndarray,
     ax_opt = []
     ay_opt = []
 
+    delta_p = []
+    F_p = []
+
     # boundary constraint: lift initial conditions
     Xk = ca.MX.sym('X0', nx)
     w.append(Xk)
 
-    n_min = (-w_tr_right_interp(0)+ veh.width/2) /scale.n
-    n_max = (w_tr_left_interp(0)- veh.width/2)/ scale.n
+    n_min = (-w_tr_right_interp(0)+ veh.width) /scale.n
+    n_max = (w_tr_left_interp(0)- veh.width)/ scale.n
 
     lbw.append([v_min, beta_min, omega_min, n_min, xi_min])       # state lower bound
     ubw.append([v_max, beta_max, omega_max, n_max, xi_max])       # state upper bound
     w0.append([v_initial, 0.0, 0.0, 0.0, 0.0])                      # state initial values
+
     x_opt.append(Xk* x_sf)
 
     ds= h
@@ -220,7 +234,7 @@ def mini_time(track: np.ndarray,
         w.append(Uk)
         lbw.append([delta_min, f_drive_min, f_brake_min, gamma_y_min])
         ubw.append([delta_max, f_drive_max, f_brake_max, gamma_y_max])
-        w0.append([0.0] * nu)
+        w0.append([0.0]* nu)
 
         # add decision variables for the state at collocation points
         Xc = []
@@ -230,7 +244,6 @@ def mini_time(track: np.ndarray,
             w.append(Xkj)
             lbw.append([-np.inf] * nx)
             ubw.append([np.inf] * nx)
-
             w0.append([v_initial, 0.0, 0.0, 0.0, 0.0])
 
         # loop all collocation points
@@ -261,32 +274,27 @@ def mini_time(track: np.ndarray,
             # add contribution to scaling factor (for calculating lap time)
             sf_opt.append(B[j]* qj* ds)
 
-        # calculate used energy
         dt_opt.append(sf_opt[0]+ sf_opt[1]+ sf_opt[2])
 
         # add new decision variables for state at end of the collocation interval
         Xk= ca.MX.sym('X_'+ str(k+ 1), nx)
         w.append(Xk)
-        n_min = (-w_tr_right_interp(k+1) + veh.width/2)/ scale.n
-        n_max = (w_tr_left_interp(k+1) - veh.width/2)/ scale.n
+        n_min = (-w_tr_right_interp(k+1)+ veh.width)/ scale.n
+        n_max = (w_tr_left_interp(k+1)- veh.width)/ scale.n
 
         lbw.append([v_min, beta_min, omega_min, n_min, xi_min])
         ubw.append([v_max, beta_max, omega_max, n_max, xi_max])
         w0.append([v_initial, 0.0, 0.0, 0.0, 0.0])
 
         # add equality constraint
-        g.append(Xk_end - Xk)
-        lbg.append([0.0] * nx)
-        ubg.append([0.0] * nx)
+        g.append(Xk_end- Xk)
+        lbg.append([0.0]* nx)
+        ubg.append([0.0]* nx)
 
-        # get accelerations (longitudinal + lateral)
-        axk, ayk = f_a(Xk, Uk)
-
-        # limit engine power
-        '''g.append(Xk[0]*scale.speed * Uk[1]*scale.F_drive /maximum.power)
-        lbg.append([0.0])
-        #ubg.append([maximum.power/ (scale.F_drive * scale.speed)])
-        ubg.append([1.0])'''
+        Fx_flk, Fx_frk, Fx_rlk, Fx_rrk = f_fx(Xk, Uk)
+        Fy_flk, Fy_frk, Fy_rlk, Fy_rrk = f_fy(Xk, Uk)
+        Fz_flk, Fz_frk, Fz_rlk, Fz_rrk = f_fz(Xk, Uk)
+        Fxk,Fyk= f_Fxy(Xk,Uk)
 
         # Kamm's Circle for each wheel
         '''g.append(((Fx_flk / (tire.mu * Fz_flk)) ** 2 + (Fy_flk / (tire.mu * Fz_flk)) ** 2))
@@ -296,37 +304,54 @@ def mini_time(track: np.ndarray,
         lbg.append([0.0] * 4)
         ubg.append([1.0] * 4)'''
 
-        # lateral wheel load transfer
-        '''g.append(((f_y_flk + f_y_frk) * ca.cos(Uk[0] * scale.delta) + f_y_rlk + f_y_rrk
-                  +(f_x_flk + f_x_frk) * ca.sin(Uk[0] * scale.delta))* veh.hcg/ ((veh.twf + veh.twr)/2)- Uk[3]* scale.gamma_y)
+        # Kamm circle for whole car
+        g.append((Fxk**2+ Fyk**2)/((trk.mu * veh.m * veh.g)**2))
         lbg.append([0.0])
-        ubg.append([0.0])'''
+        ubg.append([1.0])
+
+        # equal constraints of Gamma_y
+        Fy_k= (Fx_flk+ Fx_frk) * ca.sin(Uk[0]* scale.delta)+ (Fy_flk+ Fy_frk)* ca.cos(Uk[0]* scale.delta)+ (Fy_rlk+ Fy_rrk)
+        g.append(Fy_k* veh.hcg/((veh.twf + veh.twr)/2)- Uk[3]* scale.gamma_y)
+        lbg.append([0.0])
+        ubg.append([0.0])
 
         # no simultaneous of brake and drive
-        g.append(Uk[1]*scale.F_brake* Uk[2]*scale.F_brake)
-        lbg.append([-1/5000])
-        ubg.append([0.0])
+        g.append(Uk[1]* Uk[2])
+        lbg.append([0.0])
+        ubg.append([1/8000])
 
         # actuator
         if k>0:
             SFk = (1 -kappa_interp(k)* Xk[3]* scale.n)/ (Xk[0]* scale.speed* ca.cos(Xk[4]*scale.xi+ Xk[1]*scale.beta))
-            g.append((Uk- w[1+(k - 1)* nx])/(h* SFk))
+            U_tmp= (Uk- w[1+(k-1)* nx])
+            g.append(U_tmp/(ds* SFk))
             lbg.append([delta_min/ (act.steerT), -np.inf, f_brake_min/ (act.brakeT), -np.inf])
             ubg.append([delta_max/ (act.steerT), f_drive_max/(act.driveT), np.inf, np.inf])
 
-        # limit corner speed
-        #if ca.fabs(kappa_interp(k))>0.01:
-        if kappa_interp(k) !=0:
-            g.append(ca.power(Xk[0]*scale.speed, 2)* ca.fabs(kappa_interp(k))- trk.mu* veh.g)
-            lbg.append([-np.inf])
-            ubg.append([0.0])
+        # engine
+        '''g.append(Uk[1]- (np.sign((30/3.6)/scale.speed-Xk[0])+1)/2)
+        lbg.append([0.0])
+        ubg.append([1/5000])'''
+
+        '''if x_opt[0]< 20/3.6:
+            g.append(Uk[0]- f_drive_max)
+            lbg.append([0])
+            ubg.append([0])
+        elif 20/3.6< x_opt[0] < maximum.speed:
+            g.append(Uk[0] - 0.5*f_drive_max)
+            lbg.append([0])
+            ubg.append([0])
+        else:
+            g.append(Uk[0] - 0)
+            lbg.append([0])
+            ubg.append([0])'''
+
+        delta_p.append(Uk[0]*scale.delta)
+        F_p.append(Uk[1]*scale.F_drive+ Uk[2]*scale.F_brake)
 
         # append outputs
         x_opt.append(Xk* x_sf)
         u_opt.append(Uk* u_sf)
-        ax_opt.append(axk)
-        ay_opt.append(ayk)
-
 
     # start states = final states
     g.append(w[0]- Xk)
@@ -334,16 +359,26 @@ def mini_time(track: np.ndarray,
     ubg.append([0.0, 0.0, 0.0, 0.0, 0.0])
 
 
-    # formulate differentiation matrix (for regularization)
+    # Regular
+    diff_matrix = np.eye(N)
+    for i in range(N - 1):
+        diff_matrix[i, i + 1] = -1.0
+    diff_matrix[N - 1, 0] = -1.0
 
-    # regularization (delta)
+    delta_p = ca.vertcat(*delta_p)
+    Jp_delta = ca.mtimes(ca.MX(diff_matrix), delta_p)
+    Jp_delta = ca.dot(Jp_delta, Jp_delta)
 
-    # regularization (f_drive + f_brake)
+    F_p = ca.vertcat(*F_p)
+    Jp_f = ca.mtimes(ca.MX(diff_matrix), F_p)
+    Jp_f = ca.dot(Jp_f, Jp_f)
 
     # formulate objective
-    #J = J + pars["optim_opts"]["penalty_F"] * Jp_f + pars["optim_opts"]["penalty_delta"] * Jp_delta
+    Q_F= 0.0 #0.01
+    Q_delta= 0.0 #10
+    J = J+ Q_F* Jp_f+ Q_delta* Jp_delta
 
-    # concatenate NLP vectors
+
     w = ca.vertcat(*w)
     g = ca.vertcat(*g)
     w0 = np.concatenate(w0)
@@ -352,18 +387,13 @@ def mini_time(track: np.ndarray,
     lbg = np.concatenate(lbg)
     ubg = np.concatenate(ubg)
 
-    # concatenate output vectors
     x_opt = ca.vertcat(*x_opt)
     u_opt = ca.vertcat(*u_opt)
     dt_opt = ca.vertcat(*dt_opt)
-    ax_opt = ca.vertcat(*ax_opt)
-    ay_opt = ca.vertcat(*ay_opt)
-
 
     # ------------------------------------------------------------------------------------------------------------------
     # CREATE NLP SOLVER
     # ------------------------------------------------------------------------------------------------------------------
-
     # fill nlp structure
     nlp = {'f': J, 'x': w, 'g': g}
 
@@ -378,43 +408,30 @@ def mini_time(track: np.ndarray,
     # ------------------------------------------------------------------------------------------------------------------
     # SOLVE NLP
     # ------------------------------------------------------------------------------------------------------------------
-
     t_start = time.perf_counter()
 
-    # solve NLP
     sol = solver(x0=w0, lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg)
 
     t_end = time.perf_counter()
+    print("INFO: NLP solving time: ", t_end- t_start)
 
     if solver.stats()['return_status'] != 'Solve_Succeeded':
         print('\033[91m' + 'ERROR: Optimization fail!' + '\033[0m')
         sys.exit(1)
 
     # -----------------------------------------------------------------------------------------------------------------
-    # EXTRACT SOLUTION -------------------------------------------------------------------------------------------------
+    # EXTRACT SOLUTION
     # ------------------------------------------------------------------------------------------------------------------
+    f_sol = ca.Function('f_sol', [w], [x_opt, u_opt, dt_opt],
+                        ['w'], ['x_opt', 'u_opt', 'dt_opt'])
 
-    f_sol = ca.Function('f_sol', [w], [x_opt, u_opt, dt_opt, ax_opt, ay_opt],
-                        ['w'], ['x_opt', 'u_opt', 'dt_opt', 'ax_opt', 'ay_opt'])
+    x_opt, u_opt, dt_opt= f_sol(sol['x'])
 
-    x_opt, u_opt, dt_opt, ax_opt, ay_opt= f_sol(sol['x'])
-
-
-    x_opt = np.reshape(x_opt, (N + 1, nx))
-
+    x_opt = np.reshape(x_opt, (N+1, nx))
     u_opt = np.reshape(u_opt, (N, nu))
-
     t_opt = np.hstack((0.0, np.cumsum(dt_opt)))
 
-    #ax_opt = np.append(ax_opt[-1], ax_opt)
-    #ay_opt = np.append(ay_opt[-1], ay_opt)
-    #atot_opt = np.sqrt(np.power(ax_opt, 2) + np.power(ay_opt, 2))
-
-    # solution for energy consumption
-    #ec_opt_cum = np.hstack((0.0, np.cumsum(ec_opt))) / 3600.0
-
     return  x_opt, u_opt, t_opt
-
 
 # testing --------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
