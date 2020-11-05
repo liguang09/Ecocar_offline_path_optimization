@@ -13,7 +13,7 @@ u_opt= np.array([[67, 68, 69, 70], [67, 68, 69, 70]])
                                        x= x_opt,
                                        u= u_opt)'''
 
-print(np.deg2rad(15))
+print(3**3)
 
 
 

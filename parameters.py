@@ -22,8 +22,8 @@ maximum.omega= np.pi
 maximum.xi= np.pi
 
 maximum.delta= np.deg2rad(15)     # 15*pi/180
-maximum.F_drive= 1091    # 150Nm/R* 2 tires
-maximum.F_brake= 1800    # from brake system report
+maximum.F_drive= 1091    # N;   150Nm/R* 2 tires
+maximum.F_brake= 1000    # N;   from brake system report
 
 #maximum.power= 200 # not sure
 
@@ -31,8 +31,8 @@ maximum.F_brake= 1800    # from brake system report
 # Track
 #=======================================================================================================================
 trk= Const()
-trk.width= 6.5
-trk.mu= 0.1
+trk.width= 6.5      # m
+trk.mu= 0.3
 
 trk.lap= 1
 trk.reverse= False
@@ -68,7 +68,7 @@ veh.twr = 0.8
 veh.hcg = 0.167                     # Gravity center above ground
 veh.wheelR= 0.55/2
 veh.length= 3.4
-veh.width= 1.3*1.0                   # multiply by a safety factor
+veh.width= 1.3                   # multiply by a safety factor
 
 veh.Izz = 0.2* veh.m*(3.4**2+1.3**2)
 
@@ -108,3 +108,10 @@ act= Const()
 act.steerT= 0.2
 act.driveT= 0.05
 act.brakeT= 0.05
+
+#=======================================================================================================================
+# Regularation parameters
+#=======================================================================================================================
+regular= Const()
+regular.Q_F= 0.0
+regular.Q_delta= 0.0
