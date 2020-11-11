@@ -32,7 +32,7 @@ maximum.F_brake= 1000    # N;   from brake system report
 #=======================================================================================================================
 trk= Const()
 trk.width= 6.5      # m
-trk.mu= 0.3
+trk.mu= 0.9
 
 trk.lap= 1
 trk.reverse= False

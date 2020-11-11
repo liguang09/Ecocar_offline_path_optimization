@@ -320,13 +320,15 @@ def mini_time(track: np.ndarray,
         if k>0:
             SFk = (1 -kappa_interp(k)* Xk[3]* scale.n)/ (Xk[0]* scale.speed* ca.cos(Xk[4]*scale.xi+ Xk[1]*scale.beta))
             U_tmp= (Uk- w[1+(k-1)* num_x])
+            #U_tmp = (Uk - w[1+(k -1) * (num_x+1)]) #d=4
             g.append(U_tmp/(ds* SFk))
             lbg.append([delta_min/ (act.steerT), -np.inf, f_brake_min/ (act.brakeT), -np.inf])
             ubg.append([delta_max/ (act.steerT), f_drive_max/(act.driveT), np.inf, np.inf])
 
         # engine constraint
-        '''F_dri_poly= 2.1* ca.power(Xk[0]*scale.speed, 3)- 41.5* ca.power(Xk[0]*scale.speed, 2)+ \
-                    127.1*Xk[0]*scale.speed+ 1057
+        '''F_dri_poly= 0.0* ca.power(Xk[0]*scale.speed, 5)+ 0.1* ca.power(Xk[0]*scale.speed, 4)+ \
+                    0.9* ca.power(Xk[0]*scale.speed, 3)- 32.9* ca.power(Xk[0]*scale.speed, 2)+ \
+                    105.3*Xk[0]*scale.speed+ 1072.5
         g.append(Uk[1]- F_dri_poly/scale.F_drive)
         lbg.append([0.0])
         ubg.append([1/5000])'''
