@@ -32,7 +32,7 @@ maximum.F_brake= 1000    # N;   from brake system report
 #=======================================================================================================================
 trk= Const()
 trk.width= 6.5      # m
-trk.mu= 0.9
+trk.mu= 1
 
 trk.lap= 1
 trk.reverse= False
@@ -105,7 +105,7 @@ tire.Fz0 = 515                      # mg/4
 # Actuator constant
 #=======================================================================================================================
 act= Const()
-act.steerT= 0.2
+act.steerT= 0.2 #0.2
 act.driveT= 0.05
 act.brakeT= 0.05
 
