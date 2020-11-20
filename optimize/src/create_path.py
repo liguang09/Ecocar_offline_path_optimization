@@ -11,6 +11,3 @@ def create_path(track: np.ndarray,
     trajectory= track[:, :2]+ np.expand_dims(devi, 1)*normvec
 
     return trajectory
-
-if __name__ == "__main__":
-    pass
