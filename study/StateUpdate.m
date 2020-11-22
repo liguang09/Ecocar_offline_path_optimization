@@ -1,10 +1,10 @@
-function [s, u] = StateUpdate(s0, u_steer, t, dt)
+function [state, u] = StateUpdate(state0, u_steer, t, dt)
 
 % initial states
-x= s0(1);
-y= s0(2);
-theta= s0(3);
-v= s0(4);
+x= state0(1);
+y= state0(2);
+theta= state0(3);
+v= state0(4);
 
 L=1.516;
 m= 210;
@@ -14,7 +14,7 @@ v_off= 22/3.6;
 v_on= 18/3.6;
 f_dri_scale= 1000;
 
-s=[];
+state=[];
 u=[];
 
 f_dri= f_dri_scale;
@@ -53,7 +53,7 @@ for i=1:length(t)
         f_dri= 0;
     end
     
-    s=[s, [x; y; theta; v]];
+    state=[state, [x; y; theta; v]];
     u=[u, [steer; f_dri/f_dri_scale]];
 end
 
