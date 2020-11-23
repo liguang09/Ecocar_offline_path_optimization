@@ -6,7 +6,7 @@ m= 210;
 v_gear= 20/3.6;
 v_off= 25/3.6;
 v_on= 15/3.6;
-f_dri_scale= 1000;
+f_dri_scale= 500;
 
 state=[];
 u=[];
@@ -25,7 +25,9 @@ for j= 1: length(u_steer_dis)
         % Engine on & off
         if (v<= v_on || (v_on< v <v_off && v>v_last_iter))
             burn= 1;
-        elseif (v>= v_off || (v_on<v <v_off && v<v_last_iter))
+        end
+        
+        if (v>= v_off || (v_on<v <v_off && v<v_last_iter))
             burn= 0;
         end
         
@@ -57,7 +59,7 @@ for j= 1: length(u_steer_dis)
         
         % store results
         state=[state, [j; x; y; theta; v]];
-        u=[u, [j; steer; f_dri/f_dri_scale]];
+        u=[u, [j; steer; f_dri/f_dri_scale; burn]];
     end
 end
 
