@@ -1,11 +1,11 @@
 function [state, steer_list, f_dri_list, burn_list, iteration] = StateUpdate_dt(state0, u_steer_dis, t, dt, v_last_iter)
 
-% initialize
+% parameters
 L=1.516;
 m= 210;
 v_gear= 20/3.6;
 v_off= 25/3.6;
-v_on= 15/3.6;
+v_on= 10/3.6;
 f_dri_scale= 1000;
 
 state=[];
@@ -59,8 +59,6 @@ for j= 1: length(u_steer_dis)
             f_dri= 0;
             f_dri_list= [f_dri_list, f_dri/f_dri_scale];
         end
-        
-        
         
         % initialize 
         v_tmp= v;
