@@ -4,10 +4,11 @@ x_ref= xy_ref(1);
 y_ref= xy_ref(2);
 
 d_err_list=[];
+ds=1;
 
 for i=1: length(u_steer)
     
-    states = EngineModel(state0, u_steer(i), t, dt);
+    states = EngineModel(state0, u_steer(i), t, dt, ds);
     
     d_err_sum=0;
     
@@ -22,7 +23,7 @@ end
 
 select_path_index= find(d_err_list==(min(d_err_list)));
 
-[states_select, f_dri_select, burn_select] = EngineModel(state0, u_steer(select_path_index), t, dt);
+[states_select, f_dri_select, burn_select] = EngineModel(state0, u_steer(select_path_index), t, dt, ds);
 
 end
 
