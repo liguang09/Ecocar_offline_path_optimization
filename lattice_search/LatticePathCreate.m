@@ -1,4 +1,4 @@
-function [path_states, u, num_iter]= LatticePathCreate(state0, dt, steer_goal, dsteer, v_last, steer_last, s_stop)
+function [path_states, u, num_iter, steer_vector]= LatticePathCreate(state0, dt, steer_goal, dsteer, v_last, steer_last, s_stop)
 
 % This function is to generate a path after steer angle index is determined
 
