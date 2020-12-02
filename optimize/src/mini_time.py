@@ -16,7 +16,7 @@ def mini_time(track: np.ndarray,
     discr_point= np.arange(track.shape[0])
     discr_point = np.append(discr_point, track.shape[0])
 
-    h= 1    # optimized step
+    h= 3    # optimized step
     step= [i for i in range(discr_point.size)]
     N= step[-1]
 
@@ -378,7 +378,7 @@ def mini_time(track: np.ndarray,
     nlp = {'f': J, 'x': w, 'g': g}
 
     opts = {"expand": True,
-            "ipopt.max_iter": 4000,
+            "ipopt.max_iter": 6000,
             "ipopt.tol": 1e-7}
 
     solver = ca.nlpsol("solver", "ipopt", nlp, opts)

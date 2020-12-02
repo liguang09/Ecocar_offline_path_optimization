@@ -9,7 +9,7 @@ from parameters import scale
 
 file_paths= {}
 file_paths["module"] = os.path.dirname(os.path.abspath(__file__))
-file_paths["track_file"] = os.path.join(file_paths["module"], "tracks", "london_track" + ".csv")
+file_paths["track_file"] = os.path.join(file_paths["module"], "tracks", "rrc_track" + ".csv")
 file_paths["track_outer_file"] = os.path.join(file_paths["module"], "tracks", "london_outer" + ".csv")
 file_paths["track_inner_file"] = os.path.join(file_paths["module"], "tracks", "london_inner" + ".csv")
 
@@ -99,8 +99,8 @@ plt.rcParams['figure.dpi']= 400
 plt.figure()
 
 plt.plot(track_smooth_cl[:,0], track_smooth_cl[:,1], 'r--', linewidth=0.7)
-plt.plot(track_outer_data[:,0], track_outer_data[:,1], 'r-', linewidth= 0.7)
-plt.plot(track_inner_data[:,0], track_inner_data[:,1], 'r-', linewidth= 0.7)
+# plt.plot(track_outer_data[:,0], track_outer_data[:,1], 'r-', linewidth= 0.7)
+# plt.plot(track_inner_data[:,0], track_inner_data[:,1], 'r-', linewidth= 0.7)
 plt.plot(opt_path[:,0], opt_path[:,1], 'b-', linewidth=0.7)
 
 plt.show()
