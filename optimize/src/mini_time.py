@@ -8,7 +8,9 @@ from parameters import tire
 from parameters import act
 from parameters import trk
 from parameters import resist
+from parameters import optimize
 from parameters import regular
+
 
 def mini_time(track: np.ndarray,
               kappa: np.ndarray) -> tuple:
@@ -378,8 +380,8 @@ def mini_time(track: np.ndarray,
     nlp = {'f': J, 'x': w, 'g': g}
 
     opts = {"expand": True,
-            "ipopt.max_iter": 6000,
-            "ipopt.tol": 1e-6}
+            "ipopt.max_iter": optimize.iter,
+            "ipopt.tol": optimize.accu}
 
     solver = ca.nlpsol("solver", "ipopt", nlp, opts)
 
