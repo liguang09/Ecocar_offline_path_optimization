@@ -1,6 +1,7 @@
 import numpy as np
 import math
-import trajectory_planning_helpers.normalize_psi
+# import trajectory_planning_helpers.normalize_psi
+import prep_track.src.normalize_psi
 
 
 def calc_head_curv_num(path: np.ndarray,
@@ -11,47 +12,6 @@ def calc_head_curv_num(path: np.ndarray,
                        stepsize_curv_preview: float = 2.0,
                        stepsize_curv_review: float = 2.0,
                        calc_curv: bool = True) -> tuple:
-    """
-    author:
-    Alexander Heilmeier
-
-    .. description::
-    Numerical calculation of heading psi and curvature kappa on the basis of a given path.
-
-    .. inputs::
-    :param path:                    array of points [x, y] (always unclosed).
-    :type path:                     np.ndarray
-    :param el_lengths:              array containing the element lengths.
-    :type el_lengths:               np.ndarray
-    :param is_closed:               close path for heading and curvature calculation.
-    :type is_closed:                bool
-    :param stepsize_psi_preview:    preview/review distances used for numerical heading/curvature calculation.
-    :type stepsize_psi_preview:     float
-    :param stepsize_psi_review:     preview/review distances used for numerical heading/curvature calculation.
-    :type stepsize_psi_review:      float
-    :param stepsize_curv_preview:   preview/review distances used for numerical heading/curvature calculation.
-    :type stepsize_curv_preview:    float
-    :param stepsize_curv_review:    preview/review distances used for numerical heading/curvature calculation.
-    :type stepsize_curv_review:     float
-    :param calc_curv:               bool flag to show if curvature should be calculated (kappa is set 0.0 otherwise).
-    :type calc_curv:                bool
-
-    .. outputs::
-    :return psi:                    heading at every point (always unclosed).
-    :rtype psi:                     float
-    :return kappa:                  curvature at every point (always unclosed).
-    :rtype kappa:                   float
-
-    .. notes::
-    path must be inserted unclosed, i.e. path[-1] != path[0], even if is_closed is set True! (el_lengths is kind
-    of closed if is_closed is True of course!)
-
-    case is_closed is True:
-    len(path) = len(el_lengths) = len(psi) = len(kappa)
-
-    case is_closed is False:
-    len(path) = len(el_lengths) + 1 = len(psi) = len(kappa)
-    """
 
     # check inputs
     if is_closed and path.shape[0] != el_lengths.size:
@@ -98,7 +58,7 @@ def calc_head_curv_num(path: np.ndarray,
 
         # calculate psi of tangent vectors (pi/2 must be substracted due to our convention that psi = 0 is north)
         psi = np.arctan2(tangvecs[:, 1], tangvecs[:, 0]) - math.pi / 2
-        psi = trajectory_planning_helpers.normalize_psi.normalize_psi(psi)
+        psi = prep_track.src.normalize_psi.normalize_psi(psi)
 
         # --------------------------------------------------------------------------------------------------------------
         # CURVATURE ----------------------------------------------------------------------------------------------------
@@ -112,7 +72,7 @@ def calc_head_curv_num(path: np.ndarray,
             delta_psi = np.zeros(no_points)
 
             for i in range(no_points):
-                delta_psi[i] = trajectory_planning_helpers.normalize_psi.\
+                delta_psi[i] = prep_track.src.normalize_psi.\
                     normalize_psi(psi_temp[i + steps_tot_curv] - psi_temp[i])
 
             # calculate kappa
@@ -153,7 +113,7 @@ def calc_head_curv_num(path: np.ndarray,
 
         # calculate psi of tangent vectors (pi/2 must be substracted due to our convention that psi = 0 is north)
         psi = np.arctan2(tangvecs[:, 1], tangvecs[:, 0]) - math.pi / 2
-        psi = trajectory_planning_helpers.normalize_psi.normalize_psi(psi)
+        psi = prep_track.src.normalize_psi.normalize_psi(psi)
 
         # --------------------------------------------------------------------------------------------------------------
         # CURVATURE ----------------------------------------------------------------------------------------------------
@@ -168,7 +128,7 @@ def calc_head_curv_num(path: np.ndarray,
             delta_psi[-1] = psi[-1] - psi[-2]  # i == -1
 
             # normalize delta_psi
-            delta_psi = trajectory_planning_helpers.normalize_psi.normalize_psi(delta_psi)
+            delta_psi = prep_track.src.normalize_psi.normalize_psi(delta_psi)
 
             # calculate kappa
             kappa = np.zeros(no_points)
@@ -181,8 +141,3 @@ def calc_head_curv_num(path: np.ndarray,
             kappa = 0.0
 
     return psi, kappa
-
-
-# testing --------------------------------------------------------------------------------------------------------------
-if __name__ == "__main__":
-    pass

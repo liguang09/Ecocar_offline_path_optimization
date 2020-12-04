@@ -6,31 +6,6 @@ def calc_spline_lengths(coeffs_x: np.ndarray,
                         coeffs_y: np.ndarray,
                         quickndirty: bool = False,
                         no_interp_points: int = 15) -> np.ndarray:
-    """
-    author:
-    Alexander Heilmeier
-
-    .. description::
-    Calculate spline lengths for third order splines defining x- and y-coordinates by usage of intermediate steps.
-
-    .. inputs::
-    :param coeffs_x:            coefficient matrix of the x splines with size (no_splines x 4).
-    :type coeffs_x:             np.ndarray
-    :param coeffs_y:            coefficient matrix of the y splines with size (no_splines x 4).
-    :type coeffs_y:             np.ndarray
-    :param quickndirty:         True returns lengths based on distance between first and last spline point instead of
-                                using interpolation.
-    :type quickndirty:          bool
-    :param no_interp_points:    length calculation is carried out with the given number of interpolation steps.
-    :type no_interp_points:     int
-
-    .. outputs::
-    :return spline_lengths:     length of every spline segment.
-    :rtype spline_lengths:      np.ndarray
-
-    .. notes::
-    len(coeffs_x) = len(coeffs_y) = len(spline_lengths)
-    """
 
     # ------------------------------------------------------------------------------------------------------------------
     # PREPARATIONS -----------------------------------------------------------------------------------------------------
@@ -76,8 +51,3 @@ def calc_spline_lengths(coeffs_x: np.ndarray,
             spline_lengths[i] = np.sum(np.sqrt(np.sum(np.power(np.diff(spl_coords, axis=0), 2), axis=1)))
 
     return spline_lengths
-
-
-# testing --------------------------------------------------------------------------------------------------------------
-if __name__ == "__main__":
-    pass

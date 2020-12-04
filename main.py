@@ -3,7 +3,6 @@ import os
 import matplotlib.pyplot as plt
 import prep_track
 import optimize
-#import trajectory_planning_helpers as tph
 from parameters import maximum
 from parameters import scale
 

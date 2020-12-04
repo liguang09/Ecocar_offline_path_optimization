@@ -22,8 +22,8 @@ maximum.omega= np.pi
 maximum.xi= np.pi
 
 maximum.delta= np.deg2rad(15)     # 15*pi/180
-maximum.F_drive= 545*2   # N;   150Nm/R* 2 tires
-maximum.F_brake= 550*2 #435    # N;   from brake system report
+maximum.F_drive= 545   # N;   150Nm/R* 2 tires
+maximum.F_brake= 435    # N;   from brake system report
 
 #maximum.power= 200 # not sure
 
@@ -31,7 +31,7 @@ maximum.F_brake= 550*2 #435    # N;   from brake system report
 # Track
 #=======================================================================================================================
 trk= Const()
-trk.width= 9      # m
+trk.width= 8      # m, 6 for london
 trk.mu= 1
 
 trk.lap= 1
@@ -52,7 +52,7 @@ scale.xi= maximum.xi
 scale.delta= maximum.delta
 scale.F_drive= maximum.F_drive
 scale.F_brake= maximum.F_brake
-scale.gamma_y= 500.0
+scale.gamma_y= 250.0
 
 #=======================================================================================================================
 # Vehicle parameters
@@ -92,7 +92,7 @@ resist.Cl= 0.2474                       # lift coefficient
 #=======================================================================================================================
 tire= Const()
 tire.mu= trk.mu
-a= 0.0
+a= 0.5
 
 # Pacejka parameters
 tire.eps= -0.1*a        #-0.1
@@ -105,7 +105,7 @@ tire.Fz0 = 515                      # mg/4
 # Actuator constant
 #=======================================================================================================================
 act= Const()
-act.steerT= 0.2 #0.2
+act.steerT= 0.2     #0.2
 act.driveT= 0.05
 act.brakeT= 0.05
 
@@ -114,7 +114,7 @@ act.brakeT= 0.05
 #=======================================================================================================================
 optimize= Const()
 optimize.accu= 1e-07
-optimize.iter= 6000
+optimize.iter= 8000
 
 regular= Const()
 regular.Q_F= 0.0
