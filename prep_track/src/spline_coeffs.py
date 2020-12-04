@@ -90,6 +90,3 @@ def spline_coeffs(track: np.ndarray) -> tuple:
     normvec= np.expand_dims(norm_factors, axis=1)* normvec_temp
 
     return coeffs_x, coeffs_y, M, normvec
-
-if __name__ == "__main__":
-    pass

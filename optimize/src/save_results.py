@@ -11,7 +11,9 @@ def save_results(trajectory_opt: np.ndarray,
                  u_opt: np.ndarray,
                  kappa_opt: np.ndarray,
                  s_center: np.ndarray,
-                 kappa_center: np.ndarray) -> None:
+                 kappa_center: np.ndarray,
+                 bound_outer: np.ndarray,
+                 bound_inner: np.ndarray) -> None:
 
     file_path = {}
     file_path["module"] = os.path.join(os.path.dirname(os.path.abspath(__file__)))
@@ -55,3 +57,11 @@ def save_results(trajectory_opt: np.ndarray,
     header_t = "t;"
     fmt_t = "%.5f"
     np.savetxt(os.path.join(export_path, 'time.csv'), t_opt, fmt=fmt_t, header=header_t)
+
+    header_outer = "outer_x; outer_y"
+    fmt_outer = "%.5f; %.5f"
+    np.savetxt(os.path.join(export_path, 'bound_outer.csv'), bound_outer, fmt=fmt_outer, header=header_outer)
+
+    header_inner = "inner_x; inner_y"
+    fmt_inner = "%.5f; %.5f"
+    np.savetxt(os.path.join(export_path, 'bound_inner.csv'), bound_inner, fmt=fmt_inner, header=header_inner)

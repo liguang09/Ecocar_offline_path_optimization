@@ -69,7 +69,7 @@ opt_path_cl= np.vstack((opt_path[:, :2], opt_path[0, :2]))
 
 # optimized curvature
 # coe_x_opt, coe_y_opt, a_interp, normvec_interp = tph.calc_splines.calc_splines(path=track_smooth_xy_cl)
-coe_x_opt, coe_y_opt, _, _ = prep_track.src.spline_coeffs.spline_coeffs(track=opt_path_cl)
+coe_x_opt, coe_y_opt, _, normvec = prep_track.src.spline_coeffs.spline_coeffs(track=opt_path_cl)
 spline_lengths_opt = prep_track.src.calc_spline_lengths.calc_spline_lengths(coeffs_x=coe_x_opt, coeffs_y=coe_y_opt)
 
 spline_lengths_opt= np.insert(spline_lengths_opt, 0, 0.0)
@@ -77,6 +77,8 @@ kappa_opt= prep_track.src.calc_head_curv_num.calc_head_curv_num(path= opt_path_c
                                                      el_lengths= spline_lengths_opt,
                                                      is_closed=True)[1]
 
+bound_outer= track_smooth_cl[:, :2] + normvec* np.expand_dims(track_smooth_cl[:, 2], 1)
+bound_inner= track_smooth_cl[:, :2] - normvec* np.expand_dims(track_smooth_cl[:, 3], 1)
 #=======================================================================================================================
 # Export result
 #=======================================================================================================================
@@ -88,7 +90,9 @@ optimize.src.save_results.save_results(trajectory_opt=opt_path_cl,
                                        u_opt= u_opt,
                                        kappa_opt= kappa_opt,
                                        s_center= spline_lengths,
-                                       kappa_center= kappa)
+                                       kappa_center= kappa,
+                                       bound_outer= bound_outer,
+                                       bound_inner= bound_inner)
 
 
 #=======================================================================================================================
@@ -103,8 +107,8 @@ plt.rcParams['figure.dpi']= 400
 plt.figure()
 
 plt.plot(track_smooth_cl[:,0], track_smooth_cl[:,1], 'r--', linewidth=0.7)
-# plt.plot(track_outer_data[:,0], track_outer_data[:,1], 'r-', linewidth= 0.7)
-# plt.plot(track_inner_data[:,0], track_inner_data[:,1], 'r-', linewidth= 0.7)
+plt.plot(bound_outer[:,0], bound_outer[:,1], 'r-', linewidth= 0.7)
+plt.plot(bound_inner[:,0], bound_inner[:,1], 'r-', linewidth= 0.7)
 plt.plot(opt_path[:,0], opt_path[:,1], 'b-', linewidth=0.7)
 
 plt.show()
