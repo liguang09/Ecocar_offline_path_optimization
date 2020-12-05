@@ -68,7 +68,7 @@ veh.twr = 0.8
 veh.hcg = 0.167                     # Gravity center above ground
 veh.wheelR= 0.55/2
 veh.length= 3.4
-veh.width= 1.3*1.5                   # multiply by a safety factor
+veh.width= 1.3*1.5                  # multiply by a safety factor
 
 veh.Izz = 0.2* veh.m*(3.4**2+1.3**2)
 

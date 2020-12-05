@@ -18,9 +18,9 @@ path_states=[];
 path_info= [];
 u=[];
 
-v_gear= 20/3.6;
+v_gear= 15/3.6;
 v_off= 25/3.6;
-v_on= 15/3.6;
+v_on= 10/3.6;
 
 f_dri_last= 0;
 
@@ -82,7 +82,7 @@ while (s_cum< s_stop)
     
     
     % resistance & x dimension effort
-    f_drag= 0.5*0.14*1.15*1.7577*v_now^2*5;
+    f_drag= 0.5*0.14*1.15*1.7577*v_now^2*10;
     fx= (f_brk/2-f_drag/2)* cos(u_steer)+ f_dri- f_drag/2+f_brk/2;
     
     % Update states based on kinematic model

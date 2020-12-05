@@ -8,7 +8,7 @@ from parameters import scale
 
 file_paths= {}
 file_paths["module"] = os.path.dirname(os.path.abspath(__file__))
-file_paths["track_file"] = os.path.join(file_paths["module"], "tracks", "rrc_track_1140" + ".csv")
+file_paths["track_file"] = os.path.join(file_paths["module"], "tracks", "random_track" + ".csv")
 file_paths["track_outer_file"] = os.path.join(file_paths["module"], "tracks", "london_outer" + ".csv")
 file_paths["track_inner_file"] = os.path.join(file_paths["module"], "tracks", "london_inner" + ".csv")
 
