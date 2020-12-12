@@ -130,8 +130,8 @@ def mini_distance(reftrack: np.ndarray,
     """
 
     # calculate allowed deviation from refline
-    dev_max_right = reftrack[:, 2] - veh.width / 2
-    dev_max_left = reftrack[:, 3] - veh.width / 2
+    dev_max_right = reftrack[:, 2] - (veh.width/1.5) / 2
+    dev_max_left = reftrack[:, 3] - (veh.width/1.5) / 2
 
     # set minimum deviation to zero
     dev_max_right[dev_max_right < 0.001] = 0.001

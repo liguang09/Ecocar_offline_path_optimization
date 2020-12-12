@@ -22,7 +22,7 @@ maximum.omega= np.pi
 maximum.xi= np.pi
 
 maximum.delta= np.deg2rad(15)     # 15*pi/180
-maximum.F_drive= 545   # N;   150Nm/R* 2 tires
+maximum.F_drive= 545    # N;   150Nm/R tires
 maximum.F_brake= 435    # N;   from brake system report
 
 #maximum.power= 200 # not sure
@@ -31,8 +31,8 @@ maximum.F_brake= 435    # N;   from brake system report
 # Track
 #=======================================================================================================================
 trk= Const()
-trk.width= 8      # m, 6 for london
-trk.mu= 1
+trk.width= 6      # m, 6 for london
+trk.mu= 1.0      # 1.0-> ideal, 0.3-> snow, 0.5-> wet
 
 trk.lap= 1
 trk.reverse= False
@@ -83,9 +83,9 @@ resist= Const()
 
 resist.rho= 1.15
 resist.A= 1.7577
-resist.Cd= 0.14         #0.4254       #0.0693         # drag coefficient, from DTU webpage
-resist.Cr= 0.0025       #0.016          # static rolling resistance coefficient, from wiki
-resist.Cl= 0.2474                       # lift coefficient
+resist.Cd= 0.14          # drag coefficient, from DTU webpage
+resist.Cr= 0.0025        # static rolling resistance coefficient, from wiki "rolling resistance"
+resist.Cl= 0.25          # lift coefficient
 
 #=======================================================================================================================
 # Tire
@@ -95,18 +95,18 @@ tire.mu= trk.mu
 a= 0.5
 
 # Pacejka parameters
-tire.eps= -0.1*a        #-0.1
-tire.C= 2.5*a           #2.5
-tire.B = 10.0*a         #10
-tire.E = 0.5*a          #0.5
-tire.Fz0 = 515                      # mg/4
+tire.eps= -0.1*a
+tire.C= 2.5*a
+tire.B = 10.0*a
+tire.E = 0.5*a
+tire.Fz0 = 515                    # mg/4
 
 #=======================================================================================================================
 # Actuator constant
 #=======================================================================================================================
 act= Const()
-act.steerT= 0.2     #0.2
-act.driveT= 0.05
+act.steerT= 0.9         # ideal-> 0.9
+act.driveT= 1.25
 act.brakeT= 0.05
 
 #=======================================================================================================================
@@ -115,6 +115,7 @@ act.brakeT= 0.05
 optimize= Const()
 optimize.accu= 1e-07
 optimize.iter= 8000
+optimize.step= 1
 
 regular= Const()
 regular.Q_F= 0.0

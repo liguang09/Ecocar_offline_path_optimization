@@ -18,7 +18,7 @@ def mini_time(track: np.ndarray,
     discr_point= np.arange(track.shape[0])
     discr_point = np.append(discr_point, track.shape[0])
 
-    h= 1.1    # optimized step
+    h= optimize.step    # optimized step
     step= [i for i in range(discr_point.size)]
     N= step[-1]
 

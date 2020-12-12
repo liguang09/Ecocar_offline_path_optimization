@@ -54,6 +54,7 @@ kappa= prep_track.src.calc_head_curv_num.calc_head_curv_num(path= track_smooth_c
 #=======================================================================================================================
 #%% Start Optimization
 x_opt, u_opt, t_opt= optimize.src.mini_time.mini_time(track= track_smooth_cl, kappa= kappa)
+n_opt_mindist= optimize.src.mini_distance.mini_distance(reftrack= track_smooth_cl, normvectors= normvec_interp)
 
 n_opt= -x_opt[:-1, 3]
 v_opt= x_opt[:-1, 0]
@@ -64,8 +65,10 @@ t_orig= s_cumsum[-1]/maximum.speed
 #=======================================================================================================================
 # optimized path
 opt_path= optimize.src.create_path.create_path(track= track_smooth_cl, devi= n_opt)
+opt_path_min_dist= optimize.src.create_path.create_path(track= track_smooth_cl, devi= n_opt_mindist)
 
 opt_path_cl= np.vstack((opt_path[:, :2], opt_path[0, :2]))
+opt_path_mindist_cl= np.vstack((opt_path_min_dist[:, :2], opt_path_min_dist[0, :2]))
 
 # optimized curvature
 # coe_x_opt, coe_y_opt, a_interp, normvec_interp = tph.calc_splines.calc_splines(path=track_smooth_xy_cl)
@@ -110,7 +113,15 @@ plt.plot(track_smooth_cl[:,0], track_smooth_cl[:,1], 'r--', linewidth=0.7)
 plt.plot(bound_outer[:,0], bound_outer[:,1], 'r-', linewidth= 0.7)
 plt.plot(bound_inner[:,0], bound_inner[:,1], 'r-', linewidth= 0.7)
 plt.plot(opt_path[:,0], opt_path[:,1], 'b-', linewidth=0.7)
+plt.plot(opt_path_mindist_cl[:,0], opt_path_mindist_cl[:,1], 'b--', linewidth=0.7)
 
+plt.show()
+
+plt.figure()
+plt.plot(track_smooth_cl[:,0], track_smooth_cl[:,1], 'r--', linewidth=0.7)
+plt.plot(bound_outer[:,0], bound_outer[:,1], 'r-', linewidth= 0.7)
+plt.plot(bound_inner[:,0], bound_inner[:,1], 'r-', linewidth= 0.7)
+plt.plot(opt_path_mindist_cl[:,0], opt_path_mindist_cl[:,1], 'b-', linewidth=0.7)
 plt.show()
 
 print('original lap time:', t_orig,'s')
