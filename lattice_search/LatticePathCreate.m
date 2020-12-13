@@ -18,8 +18,8 @@ path_states=[];
 path_info= [];
 u=[];
 
-v_gear= 18/3.6*0.1;
-v_off= 25/3.6*0.1;
+v_gear= 18/3.6;
+v_off= 25/3.6;
 v_on= 15/3.6;
 
 f_dri_last= 0;
