@@ -11,7 +11,6 @@ from parameters import resist
 from parameters import optimize
 from parameters import regular
 
-
 def mini_time(track: np.ndarray,
               kappa: np.ndarray) -> tuple:
 

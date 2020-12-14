@@ -22,7 +22,7 @@ maximum.omega= np.pi
 maximum.xi= np.pi
 
 maximum.delta= np.deg2rad(15)     # 15*pi/180
-maximum.F_drive= 545    # N;   150Nm/R tires
+maximum.F_drive= 328 #545    # N;   150Nm/R tires
 maximum.F_brake= 435    # N;   from brake system report
 
 #maximum.power= 200 # not sure
