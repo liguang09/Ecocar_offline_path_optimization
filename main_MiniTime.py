@@ -7,7 +7,7 @@ from parameters import maximum
 
 file_paths= {}
 file_paths["module"] = os.path.dirname(os.path.abspath(__file__))
-file_paths["track_file"] = os.path.join(file_paths["module"], "tracks", "london_track" + ".csv")
+file_paths["track_file"] = os.path.join(file_paths["module"], "tracks", "rectangle_track" + ".csv")
 
 #=======================================================================================================================
 # import track

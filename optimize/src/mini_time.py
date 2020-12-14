@@ -300,17 +300,17 @@ def mini_time(track: np.ndarray,
         ubg.append([0.0])
 
         # Kamm circle for individual wheel
-        '''g.append(((Fx_flk / (tire.mu * Fz_flk)) ** 2 + (Fy_flk / (tire.mu * Fz_flk)) ** 2))
-        g.append(((Fx_frk / (tire.mu * Fz_frk)) ** 2 + (Fy_frk / (tire.mu * Fz_frk)) ** 2))
-        g.append(((Fx_rlk / (tire.mu * Fz_rlk)) ** 2 + (Fy_rlk / (tire.mu * Fz_rlk)) ** 2))
-        g.append(((Fx_rrk / (tire.mu * Fz_rrk)) ** 2 + (Fy_rrk / (tire.mu * Fz_rrk)) ** 2))
+        g.append(((Fx_flk / (trk.mu * Fz_flk)) ** 2 + (Fy_flk / (trk.mu * Fz_flk)) ** 2))
+        g.append(((Fx_frk / (trk.mu * Fz_frk)) ** 2 + (Fy_frk / (trk.mu * Fz_frk)) ** 2))
+        g.append(((Fx_rlk / (trk.mu * Fz_rlk)) ** 2 + (Fy_rlk / (trk.mu * Fz_rlk)) ** 2))
+        g.append(((Fx_rrk / (trk.mu * Fz_rrk)) ** 2 + (Fy_rrk / (trk.mu * Fz_rrk)) ** 2))
         lbg.append([0.0] * 4)
-        ubg.append([1.0] * 4)'''
+        ubg.append([1.0] * 4)
 
         # Kamm circle for whole car
-        g.append((Fxk**2+ Fyk**2)/((trk.mu * veh.m * veh.g)**2))
+        '''g.append((Fxk**2+ Fyk**2)/((trk.mu * veh.m * veh.g)**2))
         lbg.append([0.0])
-        ubg.append([1.0])
+        ubg.append([1.0])'''
 
         # brake and drive are not activated at same time
         g.append(Uk[1]* Uk[2])
