@@ -22,7 +22,7 @@ maximum.omega= np.pi
 maximum.xi= np.pi
 
 maximum.delta= np.deg2rad(15)     # 15*pi/180
-maximum.F_drive= 328 #545    # N;   150Nm/R tires
+maximum.F_drive= 328    # N;   90Nm/R tires
 maximum.F_brake= 435    # N;   from brake system report
 
 #maximum.power= 200 # not sure
@@ -31,7 +31,7 @@ maximum.F_brake= 435    # N;   from brake system report
 # Track
 #=======================================================================================================================
 trk= Const()
-trk.width= 6      # m, 6 for london
+trk.width= 6      # m, 6 for london, 8 for rrc
 trk.mu= 1.0      # 1.0-> ideal, 0.3-> snow, 0.5-> wet
 
 trk.lap= 1
@@ -68,9 +68,10 @@ veh.twr = 0.8
 veh.hcg = 0.167                     # Gravity center above ground
 veh.wheelR= 0.55/2
 veh.length= 3.4
-veh.width= 1.3*1.5                  # multiply by a safety factor
+veh.width= 1.3
+veh.k_safe= 1.5                     # a safety factor for shortest distance computation
 
-veh.Izz = 0.2* veh.m*(3.4**2+1.3**2)
+veh.Izz = 0.2* veh.m*(3.4**2+1.3**2)    # approximate by the inertia of oval
 
 veh.k_roll = 0.5                    # suspension related roll balance relationship
 veh.k_drive= 0

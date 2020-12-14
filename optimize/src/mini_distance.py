@@ -41,8 +41,8 @@ def mini_distance(track: np.ndarray,
                     + 2 * normvectors[0, 0] * track[0, 0] + 2 * normvectors[0, 1] * track[0, 1]
 
 
-    dev_max_right = track[:, 2] - (veh.width)/1.5
-    dev_max_left = track[:, 3] - (veh.width)/1.5
+    dev_max_right = track[:, 2]- veh.width /2 *veh.k_safe
+    dev_max_left = track[:, 3]-  veh.width /2 *veh.k_safe
 
     dev_max_right[dev_max_right < 0.001] = 0.001
     dev_max_left[dev_max_left < 0.001] = 0.001

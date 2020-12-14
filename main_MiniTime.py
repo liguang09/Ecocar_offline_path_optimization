@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import prep_track
 import optimize
 from parameters import maximum
-from parameters import scale
 
 file_paths= {}
 file_paths["module"] = os.path.dirname(os.path.abspath(__file__))
