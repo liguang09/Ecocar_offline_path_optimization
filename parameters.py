@@ -16,7 +16,7 @@ class Const(object):
 # maximum values
 #=======================================================================================================================
 maximum= Const()
-maximum.speed= 25/3.6
+maximum.speed= 15/3.6
 maximum.beta= np.pi/2
 maximum.omega= np.pi
 maximum.xi= np.pi
@@ -69,7 +69,7 @@ veh.hcg = 0.167                     # Gravity center above ground
 veh.wheelR= 0.55/2
 veh.length= 3.4
 veh.width= 1.3
-veh.k_safe= 1.5                     # a safety factor for shortest distance computation
+veh.k_safe= 1.2                     # a safety factor for shortest distance computation
 
 veh.Izz = 0.2* veh.m*(3.4**2+1.3**2)    # approximate by the inertia of oval
 
@@ -119,5 +119,5 @@ optimize.iter= 8000
 optimize.step= 1
 
 regular= Const()
-regular.Q_F= 0.0
-regular.Q_delta= 0.0
+regular.Q_F= 0.0 #10
+regular.Q_delta= 0.0 #0.01
