@@ -1,4 +1,4 @@
-function [path_states, u, num_iter, steer_vector]= LatticePathCreate(state0, dt, steer_goal, dsteer, v_last, steer_last, s_stop)
+function [path_states, u, num_iter, steer_vector]= LatticePaths(state0, dt, steer_goal, dsteer, v_last, steer_last, s_stop)
 
 % This function is to generate a path after steer angle index is determined
 
@@ -9,7 +9,6 @@ dv= state0(4)- v_last;
 num_iter= 0; % iteration for each steer angle
 f_dri_scale= 328;
 f_brk_scale= 50;
-Jz=  556.5;
 s_cum= 0;
 iter= 0;
 
@@ -24,7 +23,6 @@ v_off= 25/3.6;
 v_on= 13/3.6;
 
 f_dri_last= 0;
-% beta= state0(5);
 
 %% select the steer angle change rate
 if steer_goal- steer_last>0
@@ -50,8 +48,6 @@ while (s_cum< s_stop)
     y_now= state0(2);
     theta_now= state0(3);
     v_now= state0(4);
-    beta_now= state0(5);
-    omega_now= state0(6);
     
     % Engine on & off
     if (v_now<= v_on)
@@ -85,24 +81,17 @@ while (s_cum< s_stop)
     end
     
     % resistance & x dimension effort
-    f_drag= 0.5*0.14*1.15*1.7577*v_now^2*4;
-    fx= (f_brk/2- f_drag/2)* cos(u_steer)+ f_dri- f_drag/2+f_brk/2;
-    fy= 0.5* fx* sin(u_steer);
-    Mz= 0.5* fx* sin(u_steer)* (L/2);
-   
+    f_drag= 0.5*0.14*1.15*1.7577*v_now^2*5;
+    fx= (f_brk/2-f_drag/2)* cos(u_steer)+ f_dri- f_drag/2+f_brk/2;
     
     % Update states based on kinematic model
     x= x_now;
     y= y_now;
     theta= theta_now;
     v= v_now;
-    beta= beta_now;
-    omega= omega_now;
     
-    omega= omega+ (Mz/Jz) *dt;
-    beta= beta+ (omega+ (fy*cos(beta)- fx*sin(beta)) / (m*v) )*dt;
-    theta= theta+ v* tan(u_steer) /L *dt;
-    v= v+ (fx*cos(beta)+fy*sin(beta))/m *dt;
+    theta= theta+ v* tan(u_steer)/L *dt;
+    v= v+ fx/m *dt;
     x= x+ v*cos(theta) *dt;
     y= y+ v*sin(theta) *dt;
     
@@ -110,16 +99,15 @@ while (s_cum< s_stop)
     dydx= (y- y_now)/ (x- x_now);
     dv= v- v_now;
     
-    state0= [x, y, theta, v, beta, omega];
+    state0= [x, y, theta, v];
     s_cum= s_cum+ ds;
     
     f_dri_last= f_dri;
     
     % store results
-    path_states=[path_states; [x, y, theta, v, beta, omega]];
+    path_states=[path_states; [x, y, theta, v]];
     % path_info= [path_info; [ds, dydx]];
     u= [u; [f_dri/f_dri_scale, burn, u_steer, f_brk/f_brk_scale]];
-    
 end
 num_iter= iter;
 end
