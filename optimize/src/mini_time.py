@@ -160,7 +160,7 @@ def mini_time(track: np.ndarray,
     f_dyn= ca.Function('f_dyn', [x, u, k_curv], [dx, SF], ['x', 'u', 'k_curv'], ['dx', 'SF'])
     fx_wheels = ca.Function('fx_wheels', [x, u], [Fx_fl, Fx_fr, Fx_rl, Fx_rr], ['x', 'u'], ['Fx_fl', 'Fx_fr', 'Fx_rl', 'Fx_rr'])
     fy_wheels = ca.Function('fy_wheels', [x, u], [Fy_fl, Fy_fr, Fy_rl, Fy_rr], ['x', 'u'], ['Fy_fl', 'Fy_fr', 'Fy_rl', 'Fy_rr'])
-    fz_wheels = ca.Function('fz_wheels', [x, u], [Fz_fl, Fz_fr, Fz_rl, Fz_rr], ['x', 'u'], ['Fz_fl', 'Fz_fr', 'Fz_rl', 'Fz_rr'])
+    # fz_wheels = ca.Function('fz_wheels', [x, u], [Fz_fl, Fz_fr, Fz_rl, Fz_rr], ['x', 'u'], ['Fz_fl', 'Fz_fr', 'Fz_rl', 'Fz_rr'])
     Fxy= ca.Function('Fxy',[x, u], [Fx, Fy], ['x', 'u'], ['Fx', 'Fy'])
 
     # ==================================================================================================================
@@ -289,7 +289,7 @@ def mini_time(track: np.ndarray,
 
         Fx_flk, Fx_frk, Fx_rlk, Fx_rrk = fx_wheels(Xk, Uk)
         Fy_flk, Fy_frk, Fy_rlk, Fy_rrk = fy_wheels(Xk, Uk)
-        Fz_flk, Fz_frk, Fz_rlk, Fz_rrk = fz_wheels(Xk, Uk)
+        # Fz_flk, Fz_frk, Fz_rlk, Fz_rrk = fz_wheels(Xk, Uk)
         Fxk,Fyk= Fxy(Xk,Uk)
 
         # gamma_y equal constraints
