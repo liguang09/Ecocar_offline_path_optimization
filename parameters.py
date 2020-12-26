@@ -16,7 +16,7 @@ class Const(object):
 # maximum values
 #=======================================================================================================================
 maximum= Const()
-maximum.speed= 15/3.6
+maximum.speed= 25/3.6
 maximum.beta= np.pi/2
 maximum.omega= np.pi
 maximum.xi= np.pi
@@ -31,7 +31,7 @@ maximum.F_brake= 435    # N;   from brake system report
 # Track
 #=======================================================================================================================
 trk= Const()
-trk.width= 6      # m, 6 for london, 8 for rrc
+trk.width= 6      # m, 6 for london, 8 to 10 for rrc
 trk.mu= 1.0      # 1.0-> ideal, 0.3-> snow, 0.5-> wet
 
 trk.lap= 1
@@ -69,6 +69,7 @@ veh.hcg = 0.167                     # Gravity center above ground
 veh.wheelR= 0.55/2
 veh.length= 3.4
 veh.width= 1.3
+veh.safe= 1.1
 veh.k_safe= 1.2                     # a safety factor for shortest distance computation
 
 veh.Izz = 0.2* veh.m*(3.4**2+1.3**2)    # approximate by the inertia of oval
@@ -106,7 +107,7 @@ tire.Fz0 = 515                    # mg/4
 # Actuator constant
 #=======================================================================================================================
 act= Const()
-act.steerT= 0.9        # ideal-> 0.9
+act.steerT= 3      # ideal-> 0.9
 act.driveT= 1.25
 act.brakeT= 0.05
 

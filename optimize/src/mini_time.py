@@ -160,7 +160,7 @@ def mini_time(track: np.ndarray,
     f_dyn= ca.Function('f_dyn', [x, u, k_curv], [dx, SF], ['x', 'u', 'k_curv'], ['dx', 'SF'])
     fx_wheels = ca.Function('fx_wheels', [x, u], [Fx_fl, Fx_fr, Fx_rl, Fx_rr], ['x', 'u'], ['Fx_fl', 'Fx_fr', 'Fx_rl', 'Fx_rr'])
     fy_wheels = ca.Function('fy_wheels', [x, u], [Fy_fl, Fy_fr, Fy_rl, Fy_rr], ['x', 'u'], ['Fy_fl', 'Fy_fr', 'Fy_rl', 'Fy_rr'])
-    # fz_wheels = ca.Function('fz_wheels', [x, u], [Fz_fl, Fz_fr, Fz_rl, Fz_rr], ['x', 'u'], ['Fz_fl', 'Fz_fr', 'Fz_rl', 'Fz_rr'])
+    fz_wheels = ca.Function('fz_wheels', [x, u], [Fz_fl, Fz_fr, Fz_rl, Fz_rr], ['x', 'u'], ['Fz_fl', 'Fz_fr', 'Fz_rl', 'Fz_rr'])
     Fxy= ca.Function('Fxy',[x, u], [Fx, Fy], ['x', 'u'], ['Fx', 'Fy'])
 
     # ==================================================================================================================
@@ -275,8 +275,8 @@ def mini_time(track: np.ndarray,
         # add new decision variables for state at end of the collocation interval
         Xk= ca.MX.sym('X_'+ str(k+ 1), num_x)
         w.append(Xk)
-        n_min = (-n_right_interp(k+1)+ veh.width)/ scale.n
-        n_max = (n_left_interp(k+1)- veh.width)/ scale.n
+        n_min = (-n_right_interp(k+1)+ veh.width*veh.safe)/ scale.n
+        n_max = (n_left_interp(k+1)- veh.width*veh.safe)/ scale.n
 
         lbw.append([v_min, beta_min, omega_min, n_min, xi_min])
         ubw.append([v_max, beta_max, omega_max, n_max, xi_max])
@@ -289,7 +289,7 @@ def mini_time(track: np.ndarray,
 
         Fx_flk, Fx_frk, Fx_rlk, Fx_rrk = fx_wheels(Xk, Uk)
         Fy_flk, Fy_frk, Fy_rlk, Fy_rrk = fy_wheels(Xk, Uk)
-        # Fz_flk, Fz_frk, Fz_rlk, Fz_rrk = fz_wheels(Xk, Uk)
+        Fz_flk, Fz_frk, Fz_rlk, Fz_rrk = fz_wheels(Xk, Uk)
         Fxk,Fyk= Fxy(Xk,Uk)
 
         # gamma_y equal constraints
@@ -300,17 +300,17 @@ def mini_time(track: np.ndarray,
         ubg.append([0.0])
 
         # Kamm circle for individual wheel
-        '''g.append(((Fx_flk / (trk.mu * Fz_flk)) ** 2 + (Fy_flk / (trk.mu * Fz_flk)) ** 2))
+        g.append(((Fx_flk / (trk.mu * Fz_flk)) ** 2 + (Fy_flk / (trk.mu * Fz_flk)) ** 2))
         g.append(((Fx_frk / (trk.mu * Fz_frk)) ** 2 + (Fy_frk / (trk.mu * Fz_frk)) ** 2))
         g.append(((Fx_rlk / (trk.mu * Fz_rlk)) ** 2 + (Fy_rlk / (trk.mu * Fz_rlk)) ** 2))
         g.append(((Fx_rrk / (trk.mu * Fz_rrk)) ** 2 + (Fy_rrk / (trk.mu * Fz_rrk)) ** 2))
         lbg.append([0.0] * 4)
-        ubg.append([1.0] * 4)'''
+        ubg.append([1.0] * 4)
 
         # Kamm circle for whole car
-        g.append((Fxk**2+ Fyk**2)/((trk.mu * veh.m * veh.g)**2))
+        '''g.append((Fxk**2+ Fyk**2)/((trk.mu * veh.m * veh.g)**2))
         lbg.append([0.0])
-        ubg.append([1.0])
+        ubg.append([1.0])'''
 
         # brake and drive are not activated at same time
         g.append(Uk[1]* Uk[2])
