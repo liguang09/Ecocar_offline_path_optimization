@@ -7,7 +7,7 @@ from parameters import maximum
 
 file_paths= {}
 file_paths["module"] = os.path.dirname(os.path.abspath(__file__))
-file_paths["track_file"] = os.path.join(file_paths["module"], "tracks", "london_track" + ".csv")
+file_paths["track_file"] = os.path.join(file_paths["module"], "tracks", "random_track" + ".csv")
 
 #=======================================================================================================================
 # Pre process track
@@ -108,8 +108,8 @@ optimize.src.save_results.save_results(path_minitime= mini_time_path_cl,
                                        s_center= spline_lengths,
                                        bound_outer=bound_outer,
                                        bound_inner= bound_inner,
-                                       save_track_info= False,
-                                       save_shortest= False)
+                                       save_track_info= True,
+                                       save_shortest= True)
 
 #=======================================================================================================================
 # Show results
