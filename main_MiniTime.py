@@ -30,7 +30,7 @@ s_seg= np.insert(s_seg, 0, 0.0)
 # via spline equations
 track_smooth_xy_cl= np.vstack((track_smooth_cl[:, :2], track_smooth_cl[0, :2]))
 coeffs_x, coeffs_y, a_interp, normvec_interp = prep_track.src.spline_coeffs.spline_coeffs(track=track_smooth_xy_cl)
-spline_lengths = prep_track.src.calc_spline_lengths.calc_spline_lengths(coeffs_x=coeffs_x, coeffs_y=coeffs_y)
+spline_lengths = prep_track.src.spline_lengths.calc_spline_lengths(coeffs_x=coeffs_x, coeffs_y=coeffs_y)
 #=======================================================================================================================
 # Calculate curvature
 #=======================================================================================================================
@@ -60,7 +60,7 @@ opt_path_cl= np.vstack((opt_path[:, :2], opt_path[0, :2]))
 
 # optimized curvature
 coe_x_opt, coe_y_opt, _, normvec = prep_track.src.spline_coeffs.spline_coeffs(track=opt_path_cl)
-spline_lengths_opt = prep_track.src.calc_spline_lengths.calc_spline_lengths(coeffs_x=coe_x_opt, coeffs_y=coe_y_opt)
+spline_lengths_opt = prep_track.src.spline_lengths.calc_spline_lengths(coeffs_x=coe_x_opt, coeffs_y=coe_y_opt)
 
 spline_lengths_opt= np.insert(spline_lengths_opt, 0, 0.0)
 kappa_opt= prep_track.src.calc_head_curv_num.calc_head_curv_num(path= opt_path_cl[:, :2],

@@ -23,7 +23,7 @@ s_seg= np.insert(s_seg, 0, 0.0)
 # via spline equations
 track_smooth_xy_cl= np.vstack((track_smooth_cl[:, :2], track_smooth_cl[0, :2]))
 coeffs_x, coeffs_y, a_interp, normvec_interp = prep_track.src.spline_coeffs.spline_coeffs(track=track_smooth_xy_cl)
-spline_lengths = prep_track.src.calc_spline_lengths.calc_spline_lengths(coeffs_x=coeffs_x, coeffs_y=coeffs_y)
+spline_lengths = prep_track.src.spline_lengths.spline_lengths(coeffs_x=coeffs_x, coeffs_y=coeffs_y)
 
 # the kappa below is very slow
 # kappa= prep_track.src.cal_curvature.cal_curvature(track= track_smooth_cl[:, :2], s_length= s_cumsum)[1]
@@ -56,7 +56,7 @@ mini_dist_path= optimize.src.create_path.create_path(track= track_smooth_cl, dev
 mini_dist_path_cl= np.vstack((mini_dist_path[:, :2], mini_dist_path[0, :2]))
 
 x_time, y_time, _, n_time = prep_track.src.spline_coeffs.spline_coeffs(track=mini_time_path_cl)
-spline_lengths_time = prep_track.src.calc_spline_lengths.calc_spline_lengths(coeffs_x=x_time, coeffs_y=y_time)
+spline_lengths_time = prep_track.src.spline_lengths.spline_lengths(coeffs_x=x_time, coeffs_y=y_time)
 spline_lengths_time= np.insert(spline_lengths_time, 0, 0.0)
 s_time= np.cumsum(spline_lengths_time)
 kappa_time= prep_track.src.calc_head_curv_num.calc_head_curv_num(path=mini_time_path_cl[:, :2],
@@ -65,7 +65,7 @@ kappa_time= prep_track.src.calc_head_curv_num.calc_head_curv_num(path=mini_time_
 
 # shortest distance
 x_dist, y_dist, _, n_dist = prep_track.src.spline_coeffs.spline_coeffs(track=mini_dist_path_cl)
-spline_lengths_dist = prep_track.src.calc_spline_lengths.calc_spline_lengths(coeffs_x=x_dist, coeffs_y=y_dist)
+spline_lengths_dist = prep_track.src.spline_lengths.spline_lengths(coeffs_x=x_dist, coeffs_y=y_dist)
 s_dist= np.cumsum(spline_lengths_dist)
 spline_lengths_dist= np.insert(spline_lengths_dist, 0, 0.0)
 kappa_dist= prep_track.src.calc_head_curv_num.calc_head_curv_num(path=mini_dist_path_cl[:, :2],
@@ -78,7 +78,7 @@ kappa_dist= prep_track.src.calc_head_curv_num.calc_head_curv_num(path=mini_dist_
 weight= 0.5
 opt_path_cl= weight*mini_time_path_cl[:, :2]+ (1- weight)*mini_dist_path_cl[:, :2]
 x_opt, y_opt, _, norm_opt = prep_track.src.spline_coeffs.spline_coeffs(track=opt_path_cl)
-spline_lengths_opt = prep_track.src.calc_spline_lengths.calc_spline_lengths(coeffs_x=x_opt, coeffs_y=y_opt)
+spline_lengths_opt = prep_track.src.spline_lengths.spline_lengths(coeffs_x=x_opt, coeffs_y=y_opt)
 s_opt= np.cumsum(spline_lengths_opt)
 spline_lengths_opt= np.insert(spline_lengths_opt, 0, 0.0)
 kappa_opt= prep_track.src.calc_head_curv_num.calc_head_curv_num(path= opt_path_cl[:, :2],

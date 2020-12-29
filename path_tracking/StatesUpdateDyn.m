@@ -1,4 +1,4 @@
-function [path_states, u, num_iter, steer_vector]= LatticePathsDyn(state0, dt, steer_goal, dsteer, v_last, steer_last, s_stop)
+function [states, u, num_iter, steer_vector]= StatesUpdateDyn(state0, dt, steer_goal, dsteer, v_last, steer_last, s_stop)
 
 % This function is to generate a path after steer angle index is determined
 
@@ -17,7 +17,7 @@ iter= 0;
 
 u_steer= steer_last;
 
-path_states=[];
+states=[];
 path_info= [];
 u=[];
 
@@ -128,7 +128,7 @@ while (s_cum< s_stop)
     f_dri_last= F_drive;
     
     % store results
-    path_states=[path_states; [x, y, theta, v, beta, omega]];
+    states=[states; [x, y, theta, v, beta, omega]];
     % path_info= [path_info; [ds, dydx]];
     u= [u; [F_drive/F_dri_scale, burn, u_steer, f_brk/f_brk_scale]];
     

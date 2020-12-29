@@ -1,4 +1,4 @@
-function [path_states, u, num_iter, steer_vector]= LatticePaths(state0, dt, steer_goal, dsteer, v_last, steer_last, s_stop)
+function [states, u, num_iter, steer_vector]= StatesUpdate(state0, dt, steer_goal, dsteer, v_last, steer_last, s_stop)
 
 % This function is to generate a path after steer angle index is determined
 
@@ -7,20 +7,20 @@ L=1.516;
 m= 210;
 dv= state0(4)- v_last;
 num_iter= 0; % iteration for each steer angle
-f_dri_scale= 328;
+f_dri_scale= 328/3.5;
 f_brk_scale= 50;
 s_cum= 0;
 iter= 0;
 
 u_steer= steer_last;
 
-path_states=[];
+states=[];
 path_info= [];
 u=[];
 
 v_gear= 18/3.6;
-v_off= 25/3.6;
-v_on= 13/3.6;
+v_off= 11/3.6;
+v_on= 6.5/3.6;
 
 f_dri_last= 0;
 
@@ -52,13 +52,17 @@ while (s_cum< s_stop)
     % Engine on & off
     if (v_now<= v_on)
         burn= 1;
-    elseif (v_now> v_on && v_now< v_off)
-        if dv>=0
+    end
+    
+    if (v_now> v_on && v_now< v_off && dv>=0)
             burn= 1;
-        elseif dv< 0
+    end
+    
+    if (v_now> v_on && v_now< v_off && dv<0)
             burn= 0;
-        end
-    elseif (v_now >= v_off )
+    end
+    
+    if (v_now >= v_off )
         burn= 0;
     end
     
@@ -81,7 +85,7 @@ while (s_cum< s_stop)
     end
     
     % resistance & x dimension effort
-    f_drag= 0.5*0.14*1.15*1.7577*v_now^2*5;
+    f_drag= 0.5*0.14*1.15*1.7577*v_now^2*35;
     fx= (f_brk/2-f_drag/2)* cos(u_steer)+ f_dri- f_drag/2+f_brk/2;
     
     % Update states based on kinematic model
@@ -105,7 +109,7 @@ while (s_cum< s_stop)
     f_dri_last= f_dri;
     
     % store results
-    path_states=[path_states; [x, y, theta, v]];
+    states=[states; [x, y, theta, v]];
     % path_info= [path_info; [ds, dydx]];
     u= [u; [f_dri/f_dri_scale, burn, u_steer, f_brk/f_brk_scale]];
 end

@@ -5,13 +5,17 @@ dv= v_now- v_pre;
 
 if (v_now<= v_on)
     burn= 1;
-elseif (v_now> v_on && v_now< v_off)
-    if dv>=0
-        burn= 1;
-    elseif dv< 0
-        burn= 0;
-    end
-elseif (v_now >= v_off )
+end
+
+if (v_now> v_on &&  v_now< v_off && dv>=0)
+    burn= 1;
+end
+
+if (v_now> v_on &&  v_now< v_off && dv<0)
+    burn= 0;
+end
+
+if (v_now >= v_off )
     burn= 0;
 end
 
@@ -21,8 +25,9 @@ if burn== 1
     elseif (v_now>=v_gear && v_now<v_off)
         f_drive= 0.5* f_drive_cons;
     end
+end
     
-elseif burn== 0
+if burn== 0
     f_drive= 0;
 end
 
