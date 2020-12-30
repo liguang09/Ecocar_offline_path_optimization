@@ -7,7 +7,7 @@ L=1.516;
 m= 210;
 dv= state0(4)- v_last;
 num_iter= 0; % iteration for each steer angle
-f_dri_scale= 328/3.5;
+f_dri_scale= 328/3;
 f_brk_scale= 50;
 s_cum= 0;
 iter= 0;
@@ -18,9 +18,9 @@ states=[];
 path_info= [];
 u=[];
 
-v_gear= 18/3.6;
-v_off= 11/3.6;
-v_on= 6.5/3.6;
+v_gear= 28/3.6;
+v_off= 20/3.6;
+v_on= 10/3.6;
 
 f_dri_last= 0;
 
@@ -85,7 +85,7 @@ while (s_cum< s_stop)
     end
     
     % resistance & x dimension effort
-    f_drag= 0.5*0.14*1.15*1.7577*v_now^2*35;
+    f_drag= 0.5*0.14*1.15*1.7577*v_now^2*20; %35
     fx= (f_brk/2-f_drag/2)* cos(u_steer)+ f_dri- f_drag/2+f_brk/2;
     
     % Update states based on kinematic model

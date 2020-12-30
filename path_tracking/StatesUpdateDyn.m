@@ -22,8 +22,8 @@ path_info= [];
 u=[];
 
 v_gear= 18/3.6;
-v_off= 25/3.6;
-v_on= 25/3.6;
+v_off= 6.5/3.6;
+v_on= 11/3.6;
 
 f_dri_last= 0;
 % beta= state0(5);
@@ -58,13 +58,17 @@ while (s_cum< s_stop)
     % Engine on & off
     if (v_now<= v_on)
         burn= 1;
-    elseif (v_now> v_on && v_now< v_off)
-        if dv>=0
+    end
+    
+    if (v_now> v_on && v_now< v_off && dv>=0)
             burn= 1;
-        elseif dv< 0
+    end
+    
+    if (v_now> v_on && v_now< v_off && dv<0)
             burn= 0;
-        end
-    elseif (v_now >= v_off )
+    end
+    
+    if (v_now >= v_off )
         burn= 0;
     end
     
@@ -87,20 +91,17 @@ while (s_cum< s_stop)
     end
     
     % resistance & x dimension effort
-    F_drag= 0.5*0.14*1.15*1.7577*v_now^2*4;
+    F_drag= 0.5*0.14*1.15*1.7577*v_now^2*35;
     F_roll= m*9.81* 0.25;
     
-    F_x_f=  - F_roll* 0.5- F_drag* 0.5;
-    F_x_r= F_drive-  - F_roll* 0.5- F_drag* 0.5;
+    F_x_f= -F_roll* 0.5- F_drag* 0.5;
+    F_x_r= F_drive- F_roll* 0.5- F_drag* 0.5;
     Gamma_x= hcg/L* (F_x_f+ F_x_r);
     
     
     F_x= F_x_f* cos(u_steer)+ F_x_r;
     F_y=  F_x_f* sin(u_steer);
     Mz= 0.5* F_x* sin(u_steer)* (L/2);
-    
-    
-   
     
     % Update states based on kinematic model
     x= x_now;

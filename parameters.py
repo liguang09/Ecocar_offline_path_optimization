@@ -16,23 +16,22 @@ class Const(object):
 # maximum values
 #=======================================================================================================================
 maximum= Const()
-maximum.speed= 25/3.6
+maximum.speed= 25/3.6               # default 25
 maximum.beta= np.pi/2
 maximum.omega= np.pi
 maximum.xi= np.pi
 
-maximum.delta= np.deg2rad(15)     # 15*pi/180
-maximum.F_drive= 328    # N;   90Nm/R tires
-maximum.F_brake= 435    # N;   from brake system report
+maximum.delta= np.deg2rad(15)       # 15*pi/180
+maximum.F_drive= 328                # N;   90Nm/R on vehicle, 328N
+maximum.F_brake= 435                # N;   from brake system report, 435N
 
-#maximum.power= 200 # not sure
 
 #=======================================================================================================================
 # Track
 #=======================================================================================================================
 trk= Const()
 trk.width= 8      # m, 6 for london, 8 to 10 for rrc
-trk.mu= 1.0      # 1.0-> ideal, 0.3-> snow, 0.5-> wet
+trk.mu= 1.0/2      # 1.0-> ideal, 0.3-> snow, 0.5-> wet
 
 trk.lap= 1
 trk.reverse= False
@@ -52,7 +51,7 @@ scale.xi= maximum.xi
 scale.delta= maximum.delta
 scale.F_drive= maximum.F_drive
 scale.F_brake= maximum.F_brake
-scale.gamma_y= 250.0
+scale.gamma_y= 250        #250
 
 #=======================================================================================================================
 # Vehicle parameters
@@ -69,7 +68,7 @@ veh.hcg = 0.167                     # Gravity center above ground
 veh.wheelR= 0.55/2
 veh.length= 3.4
 veh.width= 1.3
-veh.safe= 1.2
+veh.safe= 1.0
 veh.k_safe= 1.2                     # a safety factor for shortest distance computation
 
 veh.Izz = 0.2* veh.m*(3.4**2+1.3**2)    # approximate by the inertia of oval
@@ -94,7 +93,7 @@ resist.Cl= 0.25          # lift coefficient
 #=======================================================================================================================
 tire= Const()
 tire.mu= trk.mu
-a= 0.5
+a= 0.5      #default a=0.5
 
 # Pacejka parameters
 tire.eps= -0.1*a
