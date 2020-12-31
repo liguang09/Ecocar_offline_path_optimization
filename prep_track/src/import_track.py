@@ -19,6 +19,3 @@ def import_track (file_path: str) -> np.ndarray:
         track_raw= np.flipud(track_raw)
 
     return track_raw
-
-if __name__ == "__main__":
-    pass

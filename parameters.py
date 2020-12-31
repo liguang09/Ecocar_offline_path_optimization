@@ -31,7 +31,7 @@ maximum.F_brake= 435                # N;   from brake system report, 435N
 #=======================================================================================================================
 trk= Const()
 trk.width= 8      # m, 6 for london, 8 to 10 for rrc
-trk.mu= 1.0/2      # 1.0-> ideal, 0.3-> snow, 0.5-> wet
+trk.mu= 1.0      # 1.0-> ideal, 0.3-> snow, 0.5-> wet
 
 trk.lap= 1
 trk.reverse= False
@@ -119,5 +119,5 @@ optimize.iter= 8000
 optimize.step= 1
 
 regular= Const()
-regular.Q_F= 0.0 #10
-regular.Q_delta= 0.0 #0.01
+regular.Q_F= 0.0
+regular.Q_delta= 0.0

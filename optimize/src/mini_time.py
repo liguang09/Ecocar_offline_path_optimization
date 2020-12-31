@@ -204,8 +204,6 @@ def mini_time(track: np.ndarray,
     x_opt = []
     u_opt = []
     dt_opt = []
-    ax_opt = []
-    ay_opt = []
 
     delta_p = []
     F_p = []
@@ -264,7 +262,7 @@ def mini_time(track: np.ndarray,
             # add contribution to the end state
             Xk_end = Xk_end+ D[j]* Xc[j - 1]
 
-            # add contribution to objective function
+
             J = J+ B[j]* qj* ds
 
             # add contribution to scaling factor (for calculating lap time)
@@ -293,8 +291,8 @@ def mini_time(track: np.ndarray,
         Fxk,Fyk= Fxy(Xk,Uk)
 
         # gamma_y equal constraints
-        Fy_k = (Fx_flk + Fx_frk) * ca.sin(Uk[0] * scale.delta) + (Fy_flk + Fy_frk) * ca.cos(Uk[0] * scale.delta) + (
-                    Fy_rlk + Fy_rrk)
+        Fy_k = (Fx_flk + Fx_frk) * ca.sin(Uk[0] * scale.delta) + \
+               (Fy_flk + Fy_frk) * ca.cos(Uk[0] * scale.delta) + (Fy_rlk + Fy_rrk)
         g.append(Fy_k * veh.hcg / ((veh.twf + veh.twr) / 2) - Uk[3] * scale.gamma_y)
         lbg.append([0.0])
         ubg.append([0.0])
@@ -343,7 +341,7 @@ def mini_time(track: np.ndarray,
     lbg.append([0.0]*num_x)
     ubg.append([0.0]*num_x)
 
-    # Regular
+    # Regularation
     D_matrix = np.eye(N)
     for i in range(N - 1):
         D_matrix[i, i + 1] = -1.0
@@ -371,10 +369,6 @@ def mini_time(track: np.ndarray,
     x_opt = ca.vertcat(*x_opt)
     u_opt = ca.vertcat(*u_opt)
     dt_opt = ca.vertcat(*dt_opt)
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # NLP SOLVER
-    # ------------------------------------------------------------------------------------------------------------------
 
     nlp = {'f': J, 'x': w, 'g': g}
 

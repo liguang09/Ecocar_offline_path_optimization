@@ -9,20 +9,16 @@ def spline_coeffs(track: np.ndarray) -> tuple:
         is_closed = False
 
     if not is_closed:
-        raise ValueError("Headings must be provided for unclosed spline calculation!")
+        raise ValueError("track is not closed")
 
     s_cum, s_seg= track_length.track_length(track[:, :2])
 
-    use_scale= True
     num_points= track.shape[0]-1
 
-    if use_scale and is_closed:
+    if is_closed:
         s_seg= np.append(s_seg, s_seg[0])
 
-    if use_scale:
-        scale= s_seg[:-1]/ s_seg[1:]
-    else:
-        scale= np.ones(num_points-1)
+    scale= s_seg[:-1]/ s_seg[1:]
 
     M = np.zeros((num_points* 4, num_points* 4))
     X = np.zeros((num_points* 4, 1))
@@ -81,8 +77,6 @@ def spline_coeffs(track: np.ndarray) -> tuple:
     coeffs_x = np.reshape(x_les, (num_points, 4))
     coeffs_y = np.reshape(y_les, (num_points, 4))
 
-    # get normal vector (behind used here instead of ahead for consistency with other functions) (second coefficient of
-    # cubic splines is relevant for the heading)
     normvec_temp = np.stack((coeffs_y[:, 1], -coeffs_x[:, 1]), axis=1)
 
     # normalize normal vectors
