@@ -22,8 +22,8 @@ maximum.omega= np.pi
 maximum.xi= np.pi
 
 maximum.delta= np.deg2rad(15)       # 15*pi/180
-maximum.F_drive= 328/3                # N;   90Nm/R on vehicle, 328N
-maximum.F_brake= 435/3                # N;   from brake system report, 435N
+maximum.F_drive= 328                # N;   90Nm/R on vehicle, 328N
+maximum.F_brake= 435                # N;   from brake system report, 435N
 
 
 #=======================================================================================================================
@@ -51,7 +51,7 @@ scale.xi= maximum.xi
 scale.delta= maximum.delta
 scale.F_drive= maximum.F_drive
 scale.F_brake= maximum.F_brake
-scale.gamma_y= 250/3        #250
+scale.gamma_y= 250        #250
 
 #=======================================================================================================================
 # Vehicle parameters
@@ -82,8 +82,8 @@ veh.k_brake= 0.5
 #=======================================================================================================================
 resist= Const()
 
-resist.rho= 1.15*5
-resist.A= 1.7577*4
+resist.rho= 1.15*1
+resist.A= 1.7577*1
 resist.Cd= 0.14          # drag coefficient, from DTU webpage
 resist.Cr= 0.0025        # static rolling resistance coefficient, from wiki "rolling resistance"
 resist.Cl= 0.25          # lift coefficient

@@ -7,7 +7,7 @@ from parameters import maximum
 
 file_paths= {}
 file_paths["module"] = os.path.dirname(os.path.abspath(__file__))
-file_paths["track_file"] = os.path.join(file_paths["module"], "tracks", "rrc_track" + ".csv")
+file_paths["track_file"] = os.path.join(file_paths["module"], "tracks", "random_track" + ".csv")
 
 #=======================================================================================================================
 # Pre process track
@@ -30,7 +30,7 @@ kappa= prep_track.src.curvature.calc_curv(path=track_smooth_cl[:, :2], el_length
 # Call Optimization
 #=======================================================================================================================
 #%% Shortest distance
-n_opt_mindist= optimize.src.mini_distance.mini_distance(track= track_smooth_cl, vectors= normvec_interp)
+n_opt_mindist= optimize.src.mini_distance.mini_distance(trk= track_smooth_cl)
 
 #%% Minimum time
 x_mini_time, u_mini_time, t_mini_time= optimize.src.mini_time.mini_time(track= track_smooth_cl, kappa= kappa)
@@ -93,8 +93,8 @@ optimize.src.save_results.save_results(path_minitime= mini_time_path_cl,
                                        s_center= spline_lengths,
                                        bound_outer=bound_outer,
                                        bound_inner= bound_inner,
-                                       save_track_info= False,
-                                       save_shortest= False)
+                                       save_track_info= True,
+                                       save_shortest= True)
 
 #=======================================================================================================================
 # Show results
@@ -115,8 +115,8 @@ plt.plot(track_smooth_cl[:,0], track_smooth_cl[:,1], 'b--', linewidth=0.7)
 plt.plot(bound_outer[:,0], bound_outer[:,1], 'b-', linewidth= 0.7)
 plt.plot(bound_inner[:,0], bound_inner[:,1], 'b-', linewidth= 0.7)
 plt.plot(mini_time_path_cl[:, 0], mini_time_path_cl[:, 1], 'r-', linewidth=0.5)
-#plt.plot(mini_dist_path_cl[:, 0], mini_dist_path_cl[:, 1], 'g-', linewidth=0.5)
-#plt.plot(opt_path_cl[:, 0], opt_path_cl[:, 1], 'b-', linewidth=0.5)
+plt.plot(mini_dist_path_cl[:, 0], mini_dist_path_cl[:, 1], 'g-', linewidth=0.5)
+plt.plot(opt_path_cl[:, 0], opt_path_cl[:, 1], 'b-', linewidth=0.5)
 plt.show()
 
 
