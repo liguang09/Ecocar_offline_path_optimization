@@ -14,11 +14,11 @@ from parameters import regular
 def mini_time(track: np.ndarray,
               kappa: np.ndarray) -> tuple:
 
-    discr_point= np.arange(track.shape[0])
-    discr_point = np.append(discr_point, track.shape[0])
+    dis_points= np.arange(track.shape[0])
+    dis_points = np.append(dis_points, track.shape[0])
 
     h= 1    # optimized step
-    step= [i for i in range(discr_point.size)]
+    step= [i for i in range(dis_points.size)]
     N= step[-1]
 
     kappa= np.append(kappa, kappa[0])
@@ -261,7 +261,6 @@ def mini_time(track: np.ndarray,
 
             # add contribution to the end state
             Xk_end = Xk_end+ D[j]* Xc[j - 1]
-
 
             J = J+ B[j]* qj* ds
 
