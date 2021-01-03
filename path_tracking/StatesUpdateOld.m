@@ -1,4 +1,4 @@
-function [states, u, num_iter, steer_vector]= StatesUpdate(state0, dt, steer_goal, dsteer, v_last, steer_last, s_stop, v1, v2, brake)
+function [states, u, num_iter, steer_vector]= StatesUpdate(state0, dt, steer_goal, dsteer, v_last, steer_last, s_stop)
 
 %%  parameters
 L=1.516;
@@ -17,14 +17,12 @@ path_info= [];
 u=[];
 
 v_gear= 28/3.6;
-v_on= v1/3.6;
-v_off= v2/3.6;
+v_off= 25/3.6;
+v_on= 20/3.6;
 
 f_dri_last= 0;
 
 ds_list=[];
-
-f_brk= brake;
 
 %% select the steer angle change rate
 if steer_goal- steer_last>0
@@ -80,11 +78,11 @@ while (s_cum< s_stop)
         f_dri= 0;
     end
     
-%     if v_now> v_off || (f_dri_last==  f_dri_scale && f_dri_last- f_dri== 0.5*f_dri_scale)
-%         f_brk= -0* f_brk_scale;
-%     else
-%         f_brk=0;
-%     end
+    if v_now> v_off || (f_dri_last==  f_dri_scale && f_dri_last- f_dri== 0.5*f_dri_scale)
+        f_brk= -0* f_brk_scale;
+    else
+        f_brk=0;
+    end
     
     % resistance & x dimension effort
     f_drag= 10*0.14*1.15*1.7577*v_now^2;
