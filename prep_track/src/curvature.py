@@ -1,6 +1,6 @@
 import numpy as np
 import math
-import prep_track.src.normalize_psi
+from typing import Union
 
 
 def calc_curv(path: np.ndarray,
@@ -33,7 +33,7 @@ def calc_curv(path: np.ndarray,
                          path_temp[steps_tot_psi:, 1] - path_temp[:-steps_tot_psi, 1]), axis=1)
 
     psi = np.arctan2(tangvecs[:, 1], tangvecs[:, 0]) - math.pi / 2
-    psi = prep_track.src.normalize_psi.normalize_psi(psi)
+    psi = normalize_psi(psi)
 
     psi_temp = np.insert(psi, 0, psi[-ind_step_review_curv:])
     psi_temp = np.append(psi_temp, psi[:ind_step_preview_curv])
@@ -42,7 +42,7 @@ def calc_curv(path: np.ndarray,
     delta_psi = np.zeros(no_points)
 
     for i in range(no_points):
-        delta_psi[i] = prep_track.src.normalize_psi.normalize_psi(psi_temp[i + steps_tot_curv] - psi_temp[i])
+        delta_psi[i] = normalize_psi(psi_temp[i + steps_tot_curv] - psi_temp[i])
 
     # calculate kappa
     s_points_cl = np.cumsum(el_lengths)
@@ -56,3 +56,19 @@ def calc_curv(path: np.ndarray,
     kappa = delta_psi / (s_points_temp[steps_tot_curv:] - s_points_temp[:-steps_tot_curv])
 
     return psi, kappa
+
+def normalize_psi(psi: Union[np.ndarray, float]) -> np.ndarray:
+
+    psi_out = np.sign(psi) * np.mod(np.abs(psi), 2 * math.pi)
+
+    if type(psi_out) is np.ndarray:
+        psi_out[psi_out >= math.pi] -= 2 * math.pi
+        psi_out[psi_out < -math.pi] += 2 * math.pi
+
+    else:
+        if psi_out >= math.pi:
+            psi_out -= 2 * math.pi
+        elif psi_out < -math.pi:
+            psi_out += 2 * math.pi
+
+    return psi_out
