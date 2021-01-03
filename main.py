@@ -22,8 +22,8 @@ s_cumsum= np.insert(s_cumsum, 0, 0.0)
 
 # via spline equations
 track_smooth_xy_cl= np.vstack((track_smooth_cl[:, :2], track_smooth_cl[0, :2]))
-coeffs_x, coeffs_y, a_interp, normvec_interp = prep_track.src.spline_coeffs.spline_coeffs(track=track_smooth_xy_cl)
-spline_lengths = prep_track.src.spline_lengths.spline_lengths(coeffs_x=coeffs_x, coeffs_y=coeffs_y)
+coe_x, coe_y, a_interp, normvec_interp = prep_track.src.spline_coeffs.spline_coeffs(track=track_smooth_xy_cl)
+spline_lengths = prep_track.src.spline_lengths.spline_lengths(coeffs_x=coe_x, coeffs_y=coe_y)
 
 kappa= prep_track.src.curvature.calc_curv(path=track_smooth_cl[:, :2], el_lengths= spline_lengths)[1]
 #=======================================================================================================================
@@ -93,8 +93,8 @@ optimize.src.save_results.save_results(path_minitime= mini_time_path_cl,
                                        s_center= spline_lengths,
                                        bound_outer=bound_outer,
                                        bound_inner= bound_inner,
-                                       save_track_info= True,
-                                       save_shortest= True)
+                                       save_track_info= False,
+                                       save_shortest= False)
 
 #=======================================================================================================================
 # Show results

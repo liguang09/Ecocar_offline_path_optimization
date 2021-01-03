@@ -19,7 +19,6 @@ def mini_time(track: np.ndarray,
 
     h= 1    # optimized step
     step= [i for i in range(discr_point.size)]
-    N= step[-1]
 
     kappa= np.append(kappa, kappa[0])
     n_right= np.append(track[:, 2], track[0, 2])
@@ -222,7 +221,7 @@ def mini_time(track: np.ndarray,
     x_opt.append(Xk* x_sf)
 
     ds= h
-    for k in range(N):
+    for k in range(step[-1]):
         # add decision variables for the control
         Uk = ca.MX.sym('U_' + str(k), num_u)
         w.append(Uk)
