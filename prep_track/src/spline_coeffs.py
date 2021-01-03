@@ -77,10 +77,7 @@ def spline_coeffs(track: np.ndarray) -> tuple:
     coeffs_x = np.reshape(x_les, (num_points, 4))
     coeffs_y = np.reshape(y_les, (num_points, 4))
 
-<<<<<<< Updated upstream
-=======
     # get normal vector (second coefficient of cubic splines is relevant for the heading)
->>>>>>> Stashed changes
     normvec_temp = np.stack((coeffs_y[:, 1], -coeffs_x[:, 1]), axis=1)
 
     # normalize normal vectors

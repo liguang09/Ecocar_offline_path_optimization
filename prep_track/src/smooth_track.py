@@ -86,9 +86,6 @@ def deter_signs(x: Union[tuple, np.ndarray],
                 y: Union[tuple, np.ndarray],
                 z: Union[tuple, np.ndarray]) -> float:
     signs = np.sign((y[0]- x[0])* (z[1]- x[1])- (y[1]- x[1])* (z[0]- x[0]))
-<<<<<<< Updated upstream
-    return signs
-=======
+
     return signs
 
->>>>>>> Stashed changes

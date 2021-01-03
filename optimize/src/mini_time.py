@@ -19,6 +19,7 @@ def mini_time(track: np.ndarray,
 
     h= 1    # optimized step
     step= [i for i in range(discr_point.size)]
+    N= step[-1]
 
     kappa= np.append(kappa, kappa[0])
     n_right= np.append(track[:, 2], track[0, 2])
