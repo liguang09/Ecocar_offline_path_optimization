@@ -41,16 +41,15 @@ def mini_distance(track: np.ndarray,
                     + 2 * vectors[0, 0] * track[0, 0] + 2 * vectors[0, 1] * track[0, 1]
 
 
-    dev_right = track[:, 2]- veh.width /2 *veh.k_safe
-    dev_left = track[:, 3]-  veh.width /2 *veh.k_safe
+    n_right = track[:, 2]-veh.width /2 *veh.k_safe
+    n_left = track[:, 3]-veh.width /2 *veh.k_safe
 
-    dev_right[dev_right < 0.001] = 0.001
-    dev_left[dev_left < 0.001] = 0.001
+    n_right[n_right < 0.001] = 0.001
+    n_left[n_left < 0.001] = 0.001
 
     G = np.vstack((np.eye(num_points), -np.eye(num_points)))
-    h = np.ones(2 * num_points) * np.append(dev_right, dev_left)
+    h = np.ones(2 * num_points) * np.append(n_right, n_left)
 
     epsilon = quadprog.solve_qp(H, -Q, -G.T, -h, 0)[0]
-
 
     return epsilon
