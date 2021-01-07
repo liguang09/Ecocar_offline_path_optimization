@@ -12,7 +12,8 @@ from parameters import optimize
 from parameters import regular
 
 def mini_time(track: np.ndarray,
-              kappa: np.ndarray) -> tuple:
+              kappa: np.ndarray,
+              grad_info: np.ndarray) -> tuple:
 
     dis_points= np.arange(track.shape[0])
     dis_points = np.append(dis_points, track.shape[0])
@@ -47,8 +48,9 @@ def mini_time(track: np.ndarray,
     F_drive = ca.SX.sym('F_drive')
     F_brake = ca.SX.sym('F_brake')
     gamma_y = ca.SX.sym('gamma_y')
+    grad= ca.SX.sym('grad')
 
-    u = ca.vertcat(delta, F_drive, F_brake, gamma_y)
+    u = ca.vertcat(delta, F_drive, F_brake, gamma_y, grad)
     num_u= u.size()[0]
 
     # values after scaling
@@ -62,10 +64,11 @@ def mini_time(track: np.ndarray,
     F_drive_s= scale.F_drive* F_drive
     F_brake_s= scale.F_brake* F_brake
     gamma_y_s= scale.gamma_y* gamma_y
+    grad_s= 1* grad
 
     # stack as vector
     x_sf= np.array([scale.speed, scale.beta, scale.omega, scale.n, scale.xi])
-    u_sf= np.array([scale.delta, scale.F_drive, scale.F_brake, scale.gamma_y])
+    u_sf= np.array([scale.delta, scale.F_drive, scale.F_brake, scale.gamma_y, 1])
 
     # ==================================================================================================================
     # State & Control Boundaries
@@ -149,7 +152,7 @@ def mini_time(track: np.ndarray,
 
     dn = SF* v_s* ca.sin(xi_s + beta_s)
     dxi = SF* omega_s- k_curv
-    dv= SF* (Fx* ca.cos(beta_s)+ Fy* ca.sin(beta_s)- Fd*ca.cos(beta_s))/veh.m
+    dv= SF* (Fx* ca.cos(beta_s)+ Fy* ca.sin(beta_s)- Fd*ca.cos(beta_s)-veh.m* veh.g* ca.atan(grad_s))/veh.m
     dbeta= SF* (omega_s+ (Fy* ca.cos(beta_s)- Fx* ca.sin(beta_s)+Fd*ca.sin(beta_s))/(veh.m* v_s))
     domega= SF* Mz/ veh.Izz
 
@@ -198,6 +201,8 @@ def mini_time(track: np.ndarray,
     g = []      # store inputs
     lbg = []    # inputs lower bound
     ubg = []    # inputs upper bound
+
+
     J = 0
 
     # ouput vectors
@@ -222,13 +227,14 @@ def mini_time(track: np.ndarray,
     x_opt.append(Xk* x_sf)
 
     ds= h
-    for k in range(step[-1]):
+    for k in range(N):
         # add decision variables for the control
         Uk = ca.MX.sym('U_' + str(k), num_u)
         w.append(Uk)
-        lbw.append([delta_min, f_drive_min, f_brake_min, gamma_y_min])
-        ubw.append([delta_max, f_drive_max, f_brake_max, gamma_y_max])
+        lbw.append([delta_min, f_drive_min, f_brake_min, gamma_y_min, grad_info[k]])
+        ubw.append([delta_max, f_drive_max, f_brake_max, gamma_y_max, grad_info[k]])
         w0.append([0.0]* num_u)
+
 
         # add decision variables for the state at collocation points
         Xc = []
@@ -320,8 +326,8 @@ def mini_time(track: np.ndarray,
             U_tmp= (Uk- w[1+(k-1)* num_x])
             #U_tmp = (Uk - w[1+(k -1) * (num_x+1)]) #d=4
             g.append(U_tmp/(ds* SFk))
-            lbg.append([delta_min/ (act.steerT), -np.inf, f_brake_min/ (act.brakeT), -np.inf])
-            ubg.append([delta_max/ (act.steerT), f_drive_max/(act.driveT), np.inf, np.inf])
+            lbg.append([delta_min/ (act.steerT), -np.inf, f_brake_min/ (act.brakeT), -np.inf, -np.inf])
+            ubg.append([delta_max/ (act.steerT), f_drive_max/(act.driveT), np.inf, np.inf, np.inf])
 
         # engine constraint
         '''g.append((Uk[1]- 1)*(Uk[1]- 0.5)*Uk[1])
@@ -397,4 +403,4 @@ def mini_time(track: np.ndarray,
     u_opt = np.reshape(u_opt, (N, num_u))
     t_opt = np.hstack((0.0, np.cumsum(dt_opt)))
 
-    return  x_opt, u_opt, t_opt
+    return  x_opt, u_opt[:, 0:4], t_opt

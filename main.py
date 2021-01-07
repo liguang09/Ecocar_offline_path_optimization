@@ -7,7 +7,7 @@ from parameters import maximum
 
 file_paths= {}
 file_paths["module"] = os.path.dirname(os.path.abspath(__file__))
-file_paths["track_file"] = os.path.join(file_paths["module"], "tracks", "random_track" + ".csv")
+file_paths["track_file"] = os.path.join(file_paths["module"], "tracks", "london_track" + ".csv")
 
 #=======================================================================================================================
 # Pre process track
@@ -33,7 +33,8 @@ kappa= prep_track.src.curvature.calc_curv(path=track_smooth_cl[:, :2], el_length
 n_opt_mindist= optimize.src.mini_distance.mini_distance(trk= track_smooth_cl)
 
 #%% Minimum time
-x_mini_time, u_mini_time, t_mini_time= optimize.src.mini_time.mini_time(track= track_smooth_cl, kappa= kappa)
+grad_info= np.append(track_raw[:, 4], track_raw[0, 4])
+x_mini_time, u_mini_time, t_mini_time= optimize.src.mini_time.mini_time(track= track_smooth_cl, kappa= kappa, grad_info=grad_info)
 
 n_mini_time= -x_mini_time[:-1, 3]
 v_mini_time= x_mini_time[:-1, 0]
